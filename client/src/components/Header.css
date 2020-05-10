@@ -1,0 +1,20 @@
+.header {
+  background: black;
+  padding: 15px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.header a {
+  border: 1px solid white;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 4px;
+  transition: all 0.2s;
+  margin: 5px;
+}
+
+.header a:hover {
+  font-weight: bold;
+  border: 2px solid white;
+}
