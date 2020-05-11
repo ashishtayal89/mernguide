@@ -18,8 +18,13 @@
 
 Hooks are JavaScript functions, but they impose two additional rules:
 
-1. Only call Hooks at the top level. Don’t call Hooks inside loops, conditions, or nested functions. In other works hooks should be in the components functional scope and not inside some block(block scope) declared inside a component.
+1. Only call Hooks at the top level. Don’t call Hooks inside loops, conditions, or nested functions. In other words hooks should be in the components functional scope and not inside some block(block scope) declared inside a component. This is also important so that you don't accidentally change the order of useState in-case you are using multiple useState effects. If you ignore this rule and add useState inside a conditional statement then the below error is thrown.
+   `React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render`.
 2. Only call Hooks from React function components. Don’t call Hooks from regular JavaScript functions. This is because react can only compile those hooks which are present in the functions it has access too ie the functions used as components. (There is just one other valid place to call Hooks — your own custom Hooks.)
+
+## What are hooks
+
+Hooks are functions that let you “hook into” React state and lifecycle features from function components. Hooks don’t work inside classes — they let you use React without classes.React provides a few built-in Hooks like useState. You can also create your own Hooks to reuse stateful behavior between different components.
 
 ## Types
 
@@ -30,10 +35,16 @@ Hooks are JavaScript functions, but they impose two additional rules:
 ```javascript
 import React, { useState } from "react";
 
-function Example() {
+export default function UseState() {
   // Declare a new state variable, which we'll call "count"
   const [count, setCount] = useState(0);
-
+  if (!count) {
+    setCount(count + 1);
+    setCount(
+      count => count + 1,
+      count => console.log(count) // This doen't work and thorws a warning.
+    );
+  }
   return (
     <div>
       <p>You clicked {count} times</p>
@@ -45,15 +56,30 @@ function Example() {
 
 Here `useState` is a hook.
 
-- It provides the local state count.
 - React will preserve this state between re-renders.
-- useState returns a pair -> The current state value ie **count** and a function that lets you update it ie **setCount** in this case. We can give it any name we want.
-- You can call it from anywhere
-- Similar to `this.setState` except it doen't merge the old and new state.
+- useState returns a pair -> The current state value ie **count** and a function that lets you update it ie **setCount** in this case.
+- You can call the setCount function from anywhere inside this function. Calling this function will re-render the react component.
+- You can have multiple useState hooks in a component.React assumes that if you call useState many times, you do it in the same order during every render. Also react only re-renders the component even if we have multiple useState triggers.
+- This setCount works exactly similar to `this.setState`(batch update and asynchronous) with a few differences :
+  1. It doesn't merge the old and new state.
+  2. It doesn't except a second callback for trigerring any sideeffect after setting the state. It throws the below waring if you try to do so
+     `Warning: State updates from the useState() and useReducer() Hooks don't support the second callback argument. To execute a side effect after rendering, declare it in the component body with useEffect().`
 
 ### Effect Hooks
 
 > useEffect
+
+- **What are sideeffects or effects?** : You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering.
+- The Effect Hook, useEffect, adds the ability to perform side effects from a function component. It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API.
+- When you call useEffect, you’re telling React to run your “effect” function after flushing changes to the DOM.
+- **Effects are declared inside the component so they have access to its props and state**.
+- By default, **React runs the effects after every render — including the first render**.
+- The useEffect hook accespts a callback. If we are to compare the effects callback with the class based lifecycle effects then
+  1. The body of the useEffect callback acts like componentDidMount and componentDidUpdate combined.
+  2. The return value of the useEffect callback acts like the componentWillUnmount lifecycle effect.
+
+```javascript
+```
 
 ## Additional Links
 

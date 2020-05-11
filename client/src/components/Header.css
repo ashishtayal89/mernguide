@@ -1,20 +1,27 @@
 .header {
-  background: black;
+  background: white;
   padding: 15px;
   display: flex;
   flex-wrap: wrap;
+  border-bottom: 1px solid black;
 }
 
 .header a {
-  border: 1px solid white;
+  border: 1px solid black;
   border-radius: 5px;
   cursor: pointer;
   padding: 4px;
-  transition: all 0.2s;
+  transition: all 0.1s;
   margin: 5px;
 }
 
 .header a:hover {
   font-weight: bold;
-  border: 2px solid white;
+  border: 2px solid black;
+}
+
+.moduleExample {
+  border: 1px solid black;
+  background: yellow;
+  padding: 20px !important;
 }
