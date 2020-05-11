@@ -59,7 +59,7 @@ Here `useState` is a hook.
 - React will preserve this state between re-renders.
 - useState returns a pair -> The current state value ie **count** and a function that lets you update it ie **setCount** in this case.
 - You can call the setCount function from anywhere inside this function. Calling this function will re-render the react component.
-- You can have multiple useState hooks in a component.React assumes that if you call useState many times, you do it in the same order during every render. Also react only re-renders the component even if we have multiple useState triggers.
+- You can have multiple useState hooks in a component.React assumes that if you call useState many times, you do it in the same order during every render. Also react only re-renders the component once(batch update) even if we have multiple useState triggers.
 - This setCount works exactly similar to `this.setState`(batch update and asynchronous) with a few differences :
   1. It doesn't merge the old and new state.
   2. It doesn't except a second callback for trigerring any sideeffect after setting the state. It throws the below waring if you try to do so
