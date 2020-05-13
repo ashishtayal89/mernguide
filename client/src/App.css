@@ -1,3 +1,11 @@
 .main {
   padding-top: 20px;
 }
+
+a {
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+}

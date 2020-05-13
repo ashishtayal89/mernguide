@@ -24,7 +24,11 @@ Hooks are JavaScript functions, but they impose two additional rules:
 
 ## What are hooks
 
-Hooks are functions that let you “hook into” React state and lifecycle features from function components. Hooks don’t work inside classes — they let you use React without classes.React provides a few built-in Hooks like useState. You can also create your own Hooks to reuse stateful behavior between different components.
+Hooks are functions that let you “hook into” React state and lifecycle features from function components. Hooks don’t work inside classes — they let you use React without classes.React provides a few built-in Hooks like useState. Their names always start with **use**. You can also create your own Hooks to reuse stateful behavior between different components.
+
+## When would I use a Hook?
+
+If you write a function component and realize you need to add some state to it, previously you had to convert it to a class. Now you can use a Hook inside the existing function component.
 
 ## Types
 
@@ -69,7 +73,7 @@ Here `useState` is a hook.
 
 > useEffect
 
-- **What are sideeffects or effects?** : You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering.
+- **What are sideeffects or effects?** : You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. **We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering**.
 - The Effect Hook, useEffect, adds the ability to perform side effects from a function component. It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API.
 - When you call useEffect, you’re telling React to run your “effect” function after flushing changes to the DOM.
 - **Effects are declared inside the component so they have access to its props and state**.
@@ -77,9 +81,333 @@ Here `useState` is a hook.
 - The useEffect hook accespts a callback. If we are to compare the effects callback with the class based lifecycle effects then
   1. The body of the useEffect callback acts like componentDidMount and componentDidUpdate combined.
   2. The return value of the useEffect callback acts like the componentWillUnmount lifecycle effect.
+- **In the below example React would clearInterval when the component unmounts, as well as before re-running the effect due to a subsequent render**. This means that the useEffect return function is fired on each subsequent re-render.
 
 ```javascript
+import React, { useEffect } from "react";
+
+export default function UseEffect() {
+  useEffect(() => {
+    const intId = setInterval(() => console.log("effect"), 2000);
+    return () => {
+      clearInterval(intId);
+    };
+  });
+  return (
+    <div>
+      {" "}
+      Check the console and see the continuos loggin of effect which stop once
+      we navigate to some other component
+    </div>
+  );
+}
 ```
+
+- Note how **we have to duplicate the code between these two lifecycle methods in class**.
+
+```javascript
+class Example extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    };
+  }
+
+  componentDidMount() {
+    document.title = `You clicked ${this.state.count} times`;
+  }
+  componentDidUpdate() {
+    document.title = `You clicked ${this.state.count} times`;
+  }
+
+  render() {
+    return (
+      <div>
+        <p>You clicked {this.state.count} times</p>
+        <button onClick={() => this.setState({ count: this.state.count + 1 })}>
+          Click me
+        </button>
+      </div>
+    );
+  }
+}
+```
+
+Solution with Hooks
+
+```javascript
+import React, { useState, useEffect } from "react";
+
+function Example() {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    document.title = `You clicked ${count} times`;
+  });
+
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  );
+}
+```
+
+- **What does useEffect do?** : By using this Hook, you tell React that your component needs to do something after render. React will remember the function you passed (we’ll refer to it as our “effect”), and call it later after performing the DOM updates. In this effect, we set the document title, but we could also perform data fetching or call some other imperative API.
+- **Why is useEffect called inside a component?** Placing useEffect inside the component lets us access the count state variable (or any props) right from the effect. We don’t need a special API to read it — it’s already in the function scope. **Hooks embrace JavaScript closures** and avoid introducing React-specific APIs where JavaScript already provides a solution.
+- **Why we pass a new function to useEffect every time?** : The function passed to useEffect is going to be different on every render. This is intentional. In fact, **this is what lets us read the count value from inside the effect without worrying about it getting stale**. Every time we re-render, we schedule a different effect, replacing the previous one. In a way, this makes the effects behave more like a part of the render result — each effect “belongs” to a particular render.
+- Unlike componentDidMount or componentDidUpdate, effects scheduled with useEffect don’t block the browser from updating the screen. This makes your app feel more responsive. The majority of effects don’t need to happen synchronously. In the uncommon cases where they do (such as measuring the layout), there is a separate **useLayoutEffect** Hook with an API identical to useEffect.
+
+Try the below piece of code and see the difference between the 2. In case one we first see the alert and then react updates the screen. Whereas in the second case first react updates the screen and then we see the alert.
+
+> Note : You may call setState() immediately in componentDidMount(). It will trigger an extra rendering, but it will happen before the browser updates the screen. This guarantees that even though the render() will be called twice in this case, the user won’t see the intermediate state. Use this pattern with caution because it often causes performance issues. In most cases, you should be able to assign the initial state in the constructor() instead. **It can, however, be necessary for cases like modals and tooltips when you need to measure a DOM node before rendering something that depends on its size or position**. When you encounter such a situation it is better to go for class component because this will give you a better user experience.
+
+```javascript
+export class With_ComponentDidMount extends Component {
+  componentDidMount() {
+    alert("Stop screen update");
+  }
+  render() {
+    return <div>Rendered</div>;
+  }
+}
+
+export function WithOut_ComponentDidMount() {
+  useEffect(() => {
+    alert("Stop screen update");
+  });
+  return <div>Rendered</div>;
+}
+```
+
+- **Effect with CleanUp** : It is important to clean up so that we don’t introduce a **memory leak**.Notice how componentDidMount and componentWillUnmount need to mirror each other. Lifecycle methods force us to split this logic even though conceptually code in both of them is related to the same effect.
+
+```javascript
+class FriendStatus extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { isOnline: null };
+    this.handleStatusChange = this.handleStatusChange.bind(this);
+  }
+
+  componentDidMount() {
+    ChatAPI.subscribeToFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+  componentWillUnmount() {
+    ChatAPI.unsubscribeFromFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+  handleStatusChange(status) {
+    this.setState({
+      isOnline: status.isOnline
+    });
+  }
+
+  render() {
+    if (this.state.isOnline === null) {
+      return "Loading...";
+    }
+    return this.state.isOnline ? "Online" : "Offline";
+  }
+}
+```
+
+- **Effect with Cleanup using Hooks** : React performs the cleanup when the component unmounts. Effects run for every render and not just once. This is why React also cleans up effects from the previous render before running the effects next time.
+
+```javascript
+import React, { useState, useEffect } from "react";
+
+function FriendStatus(props) {
+  const [isOnline, setIsOnline] = useState(null);
+
+  useEffect(() => {
+    function handleStatusChange(status) {
+      setIsOnline(status.isOnline);
+    }
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    // Specify how to clean up after this effect:
+    return function cleanup() {
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    };
+  });
+
+  if (isOnline === null) {
+    return "Loading...";
+  }
+  return isOnline ? "Online" : "Offline";
+}
+```
+
+- **Use Multiple Effects to Separate Concerns** :
+  **Hooks let us split the code based on what it is doing rather than a lifecycle method name**. React will apply every effect used by the component, in the order they were specified.Here is a component that combines the counter and the friend status indicator logic from the previous examples
+
+Using Class
+
+```javascript
+class FriendStatusWithCounter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { count: 0, isOnline: null };
+    this.handleStatusChange = this.handleStatusChange.bind(this);
+  }
+
+  componentDidMount() {
+    document.title = `You clicked ${this.state.count} times`;
+    ChatAPI.subscribeToFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+
+  componentDidUpdate() {
+    document.title = `You clicked ${this.state.count} times`;
+  }
+
+  componentWillUnmount() {
+    ChatAPI.unsubscribeFromFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+
+  handleStatusChange(status) {
+    this.setState({
+      isOnline: status.isOnline
+    });
+  }
+  // ...
+```
+
+Using Effects
+
+```javascript
+function FriendStatusWithCounter(props) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    document.title = `You clicked ${count} times`;
+  });
+
+  const [isOnline, setIsOnline] = useState(null);
+  useEffect(() => {
+    function handleStatusChange(status) {
+      setIsOnline(status.isOnline);
+    }
+
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    };
+  });
+  // ...
+}
+```
+
+- **Why Effects Run on Each Update** : Lets understand by example. Our class reads friend.id from this.props, subscribes to the friend status after the component mounts, and unsubscribes during unmounting.
+
+```javascript
+  componentDidMount() {
+    ChatAPI.subscribeToFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+
+  componentWillUnmount() {
+    ChatAPI.unsubscribeFromFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+```
+
+But what happens if the friend prop changes while the component is on the screen? Our component would continue displaying the online status of a different friend. This is a bug. We would also cause a memory leak or crash when unmounting since the unsubscribe call would use the wrong friend ID.
+
+```javascript
+  componentDidMount() {
+    ChatAPI.subscribeToFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+
+  componentDidUpdate(prevProps) {
+    // Unsubscribe from the previous friend.id
+    ChatAPI.unsubscribeFromFriendStatus(
+      prevProps.friend.id,
+      this.handleStatusChange
+    );
+    // Subscribe to the next friend.id
+    ChatAPI.subscribeToFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+
+  componentWillUnmount() {
+    ChatAPI.unsubscribeFromFriendStatus(
+      this.props.friend.id,
+      this.handleStatusChange
+    );
+  }
+```
+
+For Effects there is no special code for handling updates because useEffect handles them by default.
+
+```javascript
+function FriendStatus(props) {
+  // ...
+  useEffect(() => {
+    // ...
+    ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+    return () => {
+      ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+    };
+  });
+```
+
+- **Optimizing Performance by Skipping Effects** : In some cases, cleaning up or applying the effect after every render might create a performance problem. In class components, we can solve this by writing an extra comparison with prevProps or prevState inside componentDidUpdate. For useEffect pass an array as an optional second argument to useEffect.
+
+Using Class
+
+```javascript
+componentDidUpdate(prevProps, prevState) {
+  if (prevState.count !== this.state.count) {
+    document.title = `You clicked ${this.state.count} times`;
+  }
+}
+```
+
+Using Effect
+
+```javascript
+useEffect(() => {
+  document.title = `You clicked ${count} times`;
+}, [count]); // Only re-run the effect if count changes
+```
+
+Effects that have a cleanup phase. Here it will fire only when props.friend.id change.
+
+```javascript
+useEffect(() => {
+  function handleStatusChange(status) {
+    setIsOnline(status.isOnline);
+  }
+
+  ChatAPI.subscribeToFriendStatus(props.friend.id, handleStatusChange);
+  return () => {
+    ChatAPI.unsubscribeFromFriendStatus(props.friend.id, handleStatusChange);
+  };
+}, [props.friend.id]); // Only re-subscribe if props.friend.id changes
+```
+
+> Note : If you use this optimization, make sure the array includes all values from the component scope (such as props and state) that change over time and that are used by the effect. Otherwise, your code will reference stale values from previous renders.Learn more about [how to deal with functions](https://reactjs.org/docs/hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies) and [what to do when the array changes too often](https://reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often).If you want to run an effect and clean it up only once (on mount and unmount), you can pass an empty array ([]) as a second argument. This tells React that your effect doesn’t depend on any values from props or state, so it never needs to re-run. This isn’t handled as a special case — it follows directly from how the dependencies array always works.If you pass an empty array ([]), the props and state inside the effect will always have their initial values. While passing [] as the second argument is closer to the familiar componentDidMount and componentWillUnmount mental model, there are usually better solutions to avoid re-running effects too often. **Also, don’t forget that React defers running useEffect until after the browser has painted, so doing extra work is less of a problem**.We recommend using the [exhaustive-deps](https://github.com/facebook/react/issues/14920) rule as part of our [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks#installation) package. It warns when dependencies are specified incorrectly and suggests a fix.
 
 ## Additional Links
 
