@@ -6,7 +6,9 @@ This repo contains some basic concepts on hooks and context.
 
 <summary><b>HOOKS</b></summary>
 
-## Why hooks?
+<details>
+
+<summary>Why hooks?</summary>
 
 - **Reusable Statefull Logic** : This is one of the most important reasons for the introduction of hooks.Generally to reuse the statefull logic/ state of a component we make the use of **render props** or **HOC**. But in both the cases we change the architecure of our components either to abstract that logic(HOC) or reuse the logic(Render props). To resolve this difficulty react has introduced hooks which help us to separate the stateful logic from the components so that it can be reused amoung different components without any restructuring.
 
@@ -20,7 +22,10 @@ This repo contains some basic concepts on hooks and context.
 
   `Motive : All in all classed pose a challenge in the react ecosystem and otherwise in javascript itself. These chalenges are like understanding this, minification and hot reload issues and they also pose a challenge in the AOT compilation of code. So to resolve all these issue without taking away the functional power of classes, the hooks have been introduced.`
 
-## Rules of Hooks
+</details>
+
+<details>
+<summary>Rules of Hooks</summary>
 
 Hooks are JavaScript functions, but they impose two additional rules:
 
@@ -32,15 +37,24 @@ Hooks are JavaScript functions, but they impose two additional rules:
 
 > Note : React released an ESLint plugin called [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks) that enforces these two rules.This plugin is included by default in Create React App.
 
-## What are hooks
+</details>
+
+<details>
+<summary>What are hooks</summary>
 
 Hooks are functions that let you “hook into” React state and lifecycle features from function components. Hooks don’t work inside classes — they let you use React without classes.React provides a few built-in Hooks like useState. Their names always start with **use**. You can also create your own Hooks to reuse stateful behavior between different components.
 
-## When would I use a Hook?
+</details>
+
+<details>
+<summary>When would I use a Hook?</summary>
 
 If you write a function component and realize you need to add some state to it, previously you had to convert it to a class. Now you can use a Hook inside the existing function component.
 
-## Types
+</details>
+
+<details>
+<summary>Types</summary>
 
 <details>
 <summary>State Hooks</summary>
@@ -580,6 +594,7 @@ function useReducer(reducer, initialState) {
 [RFC](https://github.com/reactjs/rfcs/pull/68)
 [Dead-code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination)
 
+</details>
 </details>
 <details>
 <summary><b>CONTEXT</b></summary>
