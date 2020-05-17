@@ -21,6 +21,11 @@
   font-weight: bold;
 }
 
+.header a.active {
+  background-color: rgba(255, 0, 0, 0.2);
+  font-weight: bold;
+}
+
 .moduleExample {
   background-color: rgba(255, 0, 0, 0.1);
   padding: 20px !important;

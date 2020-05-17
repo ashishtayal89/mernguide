@@ -1,4 +1,10 @@
-# HOOKS
+# About
+
+This repo contains some basic concepts on hooks and context.
+
+<details>
+
+<summary><b>HOOKS</b></summary>
 
 ## Why hooks?
 
@@ -18,9 +24,13 @@
 
 Hooks are JavaScript functions, but they impose two additional rules:
 
-1. Only call Hooks at the top level. Don’t call Hooks inside loops, conditions, or nested functions. In other words hooks should be in the components functional scope and not inside some block(block scope) declared inside a component. This is also important so that you don't accidentally change the order of useState in-case you are using multiple useState effects. If you ignore this rule and add useState inside a conditional statement then the below error is thrown.
+1. Only call Hooks at the top level. Don’t call Hooks inside loops, conditions, or nested functions. In other words hooks should be in the components functional scope and not inside some block(block scope) declared inside a component. By following this rule, you ensure that Hooks are called in the same order each time a component renders. That’s what allows React to correctly preserve the **state of Hooks** between multiple useState and useEffect calls. If you ignore this rule and add useState inside a conditional statement then the below error is thrown.
    `React Hook "useState" is called conditionally. React Hooks must be called in the exact same order in every component render`.
 2. Only call Hooks from React function components. Don’t call Hooks from regular JavaScript functions. This is because react can only compile those hooks which are present in the functions it has access too ie the functions used as components. (There is just one other valid place to call Hooks — your own custom Hooks.)
+   - Call Hooks from React function components.
+   - Call Hooks from custom Hooks.
+
+> Note : React released an ESLint plugin called [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks) that enforces these two rules.This plugin is included by default in Create React App.
 
 ## What are hooks
 
@@ -32,9 +42,26 @@ If you write a function component and realize you need to add some state to it, 
 
 ## Types
 
-### State Hooks
+<details>
+<summary>State Hooks</summary>
 
 > useState
+
+- **Solves** :
+
+  1. Maintains component state.
+
+- **Class Counterpart** :
+
+  1. `this.setState`
+
+- **Difference from class** :
+
+  It works exactly similar to `this.setState`(batch update and asynchronous) with a few differences :
+
+  1. It doesn't merge the old and new state.
+  2. It doesn't except a second callback for trigerring any sideeffect after setting the state. It throws the below waring if you try to do so
+     `Warning: State updates from the useState() and useReducer() Hooks don't support the second callback argument. To execute a side effect after rendering, declare it in the component body with useEffect().`
 
 ```javascript
 import React, { useState } from "react";
@@ -64,14 +91,27 @@ Here `useState` is a hook.
 - useState returns a pair -> The current state value ie **count** and a function that lets you update it ie **setCount** in this case.
 - You can call the setCount function from anywhere inside this function. Calling this function will re-render the react component.
 - You can have multiple useState hooks in a component.React assumes that if you call useState many times, you do it in the same order during every render. Also react only re-renders the component once(batch update) even if we have multiple useState triggers.
-- This setCount works exactly similar to `this.setState`(batch update and asynchronous) with a few differences :
-  1. It doesn't merge the old and new state.
-  2. It doesn't except a second callback for trigerring any sideeffect after setting the state. It throws the below waring if you try to do so
-     `Warning: State updates from the useState() and useReducer() Hooks don't support the second callback argument. To execute a side effect after rendering, declare it in the component body with useEffect().`
+  </details>
 
-### Effect Hooks
+<details>
+<summary>Effect Hooks</summary>
 
 > useEffect
+
+- **Solves** :
+
+  1. It helps executes some sideeffect after dom rendering.
+  2. Resolves **Complex class component becomes hard to understand** issue. So you can keep related code at one place.
+
+- **Class Counterpart** :
+
+  1. componentDidMount
+  2. componentDidUpdate
+  3. componentWillUnmount
+
+- **Difference from class** :
+
+  1. componentDidMount is render blocking but useEffect is not.
 
 - **What are sideeffects or effects?** : You’ve likely performed data fetching, subscriptions, or manually changing the DOM from React components before. **We call these operations “side effects” (or “effects” for short) because they can affect other components and can’t be done during rendering**.
 - The Effect Hook, useEffect, adds the ability to perform side effects from a function component. It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes, but unified into a single API.
@@ -164,7 +204,7 @@ Here `useState` is a hook.
 
   Try the below piece of code and see the difference between the 2. In case one we first see the alert and then react updates the screen. Whereas in the second case first react updates the screen and then we see the alert.
 
-  > Note : You may call setState() immediately in componentDidMount(). It will trigger an extra rendering, but it will happen before the browser updates the screen. This guarantees that even though the render() will be called twice in this case, the user won’t see the intermediate state. Use this pattern with caution because it often causes performance issues. In most cases, you should be able to assign the initial state in the constructor() instead. **It can, however, be necessary for cases like modals and tooltips when you need to measure a DOM node before rendering something that depends on its size or position**. When you encounter such a situation it is better to go for class component because this will give you a better user experience.
+  > Note : You may call setState() immediately in componentDidMount(). It will trigger an extra rendering, but it will happen before the browser updates the screen. This guarantees that even though the render() will be called twice in this case, the user won’t see the intermediate state. Use this pattern with caution because it often causes performance issues. In most cases, you should be able to assign the initial state in the constructor() instead. **It can, however, be necessary for cases like modals and tooltips when you need to measure a DOM node before rendering something that depends on its size or position**. When you encounter such a situation where you need to stop the browser from updating tthe screen you should use **useLayoutEffect** instead of **useEffect**.
 
   ```javascript
   export class With_ComponentDidMount extends Component {
@@ -417,9 +457,133 @@ Here `useState` is a hook.
 
   > Note : If you use this optimization, make sure the array includes all values from the component scope (such as props and state) that change over time and that are used by the effect. Otherwise, your code will reference stale values from previous renders.Learn more about [how to deal with functions](https://reactjs.org/docs/ hooks-faq.html#is-it-safe-to-omit-functions-from-the-list-of-dependencies) and [what to do when the array changes too often](https://reactjs.org/docs/hooks-faq.html#what-can-i-do-if-my-effect-dependencies-change-too-often).If you want to run an effect and clean it up only once (on mount and unmount), you can pass an empty array ([]) as a second argument. This tells React that your effect doesn’t depend on any values from props or state, so it never needs to re-run. This isn’t handled as a special case — it follows directly from how the dependencies array always works.If you pass an empty array ([]), the props and state inside the effect will always have their initial values. While passing [] as the second argument is closer to the familiar componentDidMount and componentWillUnmount mental model, there are usually better solutions to avoid re-running effects too often. **Also, don’t forget that React defers running useEffect until after the browser has painted, so doing extra work is less of a problem**.We recommend using the [exhaustive-deps](https://github.com/facebook/react/issues/14920) rule as part of our [eslint-plugin-react-hooks](https://www.npmjs.com/package/eslint-plugin-react-hooks#installation) package. It warns when dependencies are specified incorrectly and suggests a fix.
 
+  </details>
+  <details>
+  <summary>Callback Hook</summary>
+
+> useCallback
+
+- **Solves** :
+
+  1. Prevents child component re-render due to new callback passed every time.
+
+- **Class Counterpart** :
+
+  1. Instance method of class
+
+```javascript
+const memoizedCallback = useCallback(() => {
+  doSomething(a, b);
+}, [a, b]);
+```
+
+Returns a memoized callback.
+Pass an inline callback and an array of dependencies. useCallback will return a memoized version of the callback that only changes if one of the dependencies has changed. This is useful when passing callbacks to optimized child components that rely on reference equality to prevent unnecessary renders (e.g. shouldComponentUpdate).
+
+> **useCallback(fn, deps) is equivalent to useMemo(() => fn, deps).**
+
+> Use the **exhaustive-deps** rule as part of our eslint-plugin-react-hooks package.
+
+</details>
+<details>
+<summary>Memo Hook</summary>
+
+> useMemo
+
+- **Solves**
+
+  1. It helps memoize method response value based on input arguments.
+
+```javascript
+const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+```
+
+- useMemo will only recompute the memoized value when one of the dependencies has changed. This optimization helps to avoid expensive calculations on every render.
+- The function passed to useMemo runs during rendering.
+- Side effects belong in useEffect, not useMemo.
+- In the future, React may choose to “forget” some previously memoized values and recalculate them on next render, e.g. to free memory for offscreen components.
+  </details>
+  <details>
+  <summary>Custom Hooks</summary>
+
+> use<CustomName>
+
+- **Solves**
+
+  1. Helps us extract the similar state management logic to a common place/file.
+  2. It helps us achieve **Reusable Statefull Logic** which was one of the key reasons for the introduction of hooks.
+
+- **Earlier Counterparts**
+
+  1. HOC
+  2. Render Props
+
+- **Difference from Earlier Counterparts**
+
+  1. You don't need to maintain separate react component to abstract state logic at a common place/module/file.
+  2. Custom Hooks offer the flexibility of sharing logic that wasn’t possible in React components before.
+
+- **Basic Rule for Custom Hooks**
+
+  1. Name of every custom hook should start with **use**, so that react can identify that the function is a hook.
+  2. Every call to a custom hook has its own isolated state. So calling the same custom hook from 2 different components or the same component will create 2 isolated state.
+  3. 2 components sharing same hook(custom hook) don't share the state.
+  4. Every custom hook takes an input and returns an output.
+  5. You can pass the result of one hook into another. This is general to all hooks not specific to custom hook.
+
+- **Use Cases**
+  When you have a logic to maintain and update the state of a component which is common across multiple components, we can use a custom hook. Eg :
+
+  1. Form handling
+  2. Animation
+  3. Declarative Subscription
+  4. Timers
+
+- **Using custom hooks to create a useReducer hook**
+
+This hook helps to manage the local state with a reducer. Its a pub sub pattern where you publish an action using dispatch and get notified on state update.
+
+```javascript
+function useReducer(reducer, initialState) {
+  const [state, setState] = useState(initialState);
+
+  function dispatch(action) {
+    const nextState = reducer(state, action);
+    setState(nextState);
+  }
+
+  return [state, dispatch];
+}
+```
+
+| Parent Component                                         | HOC                                           | Render Props                                                                      |
+| -------------------------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------- |
+| Parent Component is tightly coupled with child component | HOC accespts the child components to render   | Parent Component is not tightly coupled with child since child is passed as props |
+| Used for parent/child relationship.                      | Used for abstracting some common logic        | Used for reusing some common logic in parent component.                           |
+| Genrally made for specific use case in application       | Made so that it can be used throught the app. | Generally made when need to render different child using some common logic.       |
+
+| HOC/Render Props                                                                        | Custom hook                                                               |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Common logic kept inside a common component which accepts diffrent components to render | Common logic is kept is file which is shared between different compoents. |
+
+- **Rule of thumb for component state**
+
+1. No 2 component instance can share the state without the use of an external factor like Redux or Parent Component.
+2. When 2 componets share the state using a Parent Component is actully just using the state of an instance of component ie the Parent Component. Similary if they use Redux they are sharing the state using an instance of Redux store.
+3. When we use a HOC, every call to a HOC creates a new instance of react component and hence a new state.
+4. Similary when we use render props in 2 different components, we end up creating 2 separate states.
+5. **On the same lines when we call a custom hook from 2 different components we end up creating 2 separate state of custom hook**.
+   </details>
+
 ## Additional Links
 
 [RFC](https://github.com/reactjs/rfcs/pull/68)
 [Dead-code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination)
 
-# CONTEXT
+</details>
+<details>
+<summary><b>CONTEXT</b></summary>
+
+sdafasdf
+
+</details>

@@ -1,3 +1,6 @@
+.tabs {
+  height: auto;
+}
 .tabs .tab a {
   cursor: pointer;
 }
