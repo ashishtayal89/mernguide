@@ -506,7 +506,7 @@ const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
   <details>
   <summary>Custom Hooks</summary>
 
-> use<CustomName>
+> use[CustomName]
 
 - **Solves**
 
