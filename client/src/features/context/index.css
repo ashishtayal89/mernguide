@@ -1,0 +1,13 @@
+p {
+  padding: 10px;
+}
+
+p.light {
+  background: white;
+  color: black;
+}
+
+p.dark {
+  background: black;
+  color: white;
+}

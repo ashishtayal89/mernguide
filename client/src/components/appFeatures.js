@@ -1,8 +1,12 @@
 import * as UseState from "../features/hooks/UseState";
 import * as UseEffect from "../features/hooks/UseEffect";
 import * as UseMemo_UseCallback from "../features/hooks/UseMemo-UseCallback";
+import * as UseContext from "../features/hooks/UseContext";
+import * as UseReducer from "../features/hooks/UseReducer";
 import * as CustomHooks from "../features/hooks/CustomHooks";
-import moduleIterator from "../utils/moduleIterator";
+import * as Context from "../features/context";
+
+import { moduleIterator, modulesIterator } from "../utils/moduleIterator";
 
 const features = [
   {
@@ -25,9 +29,24 @@ const features = [
     component: moduleIterator(UseMemo_UseCallback)
   },
   {
+    label: "Use Context",
+    route: "/hooks/useContext",
+    component: moduleIterator(UseContext)
+  },
+  {
+    label: "Use Reducer",
+    route: "/hooks/useReducer",
+    component: moduleIterator(UseReducer)
+  },
+  {
     label: "Custom hooks",
     route: "/hooks/customHooks",
-    component: moduleIterator(CustomHooks)
+    component: modulesIterator(CustomHooks)
+  },
+  {
+    label: "Context",
+    route: "/context",
+    component: modulesIterator(Context)
   }
 ];
 

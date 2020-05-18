@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const moduleIterator = module => () => {
+export const moduleIterator = module => () => {
   const [moduleName, setModuleName] = useState(Object.keys(module)[0]);
   const keys = Object.keys(module);
   const Component = module[moduleName];
@@ -33,4 +33,17 @@ const moduleIterator = module => () => {
     </>
   );
 };
-export default moduleIterator;
+
+export const modulesIterator = module => {
+  const modules = module["default"];
+  return moduleIterator(
+    modules.reduce((acc, module) => {
+      const key = Object.keys(module)[0];
+      const Component = module[key];
+      acc[key] = Component;
+      return acc;
+    }, {})
+  );
+};
+
+export default { moduleIterator, modulesIterator };
