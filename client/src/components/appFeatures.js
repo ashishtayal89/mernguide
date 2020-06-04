@@ -5,6 +5,7 @@ import * as UseContext from "../features/hooks/UseContext";
 import * as UseReducer from "../features/hooks/UseReducer";
 import * as CustomHooks from "../features/hooks/CustomHooks";
 import * as Context from "../features/context";
+import * as Ref from "../features/ref";
 
 import { moduleIterator, modulesIterator } from "../utils/moduleIterator";
 
@@ -47,6 +48,11 @@ const features = [
     label: "Context",
     route: "/context",
     component: modulesIterator(Context)
+  },
+  {
+    label: "Ref",
+    route: "/ref",
+    component: modulesIterator(Ref)
   }
 ];
 

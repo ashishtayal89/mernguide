@@ -14,6 +14,7 @@ This repo contains some basic concepts on hooks and context.
 This is one of the most important reasons for the introduction of hooks.Generally to reuse the statefull logic/ state of a component we make the use of **render props** or **HOC**. But in both the cases we change the architecure of our components either to abstract that logic(HOC) or reuse the logic(Render props). To resolve this difficulty react has introduced hooks which help us to separate the stateful logic from the components so that it can be reused amoung different components without any restructuring.
 
 `Motive : The motive here is to maintain the common state logic out of the components so that it can be reused without any structural changes.`
+`Hook instroduced : Custom Hook`
 
 </details>
 
@@ -23,13 +24,14 @@ This is one of the most important reasons for the introduction of hooks.Generall
 We’ve often had to maintain components that started out simple but grew into an unmanageable mess of stateful logic and side effects. Each lifecycle method often contains a mix of unrelated logic. For example, components might perform some data fetching in componentDidMount and componentDidUpdate. So we are doing the same task of making api calls but in different lifecycle methods. However, the same componentDidMount method might also contain some unrelated logic that sets up event listeners, with cleanup performed in componentWillUnmount. In this case componentDidMount has api calls as well as code relating to event listeners which are 2 completely unrelated task at one place. Mutually related code that changes together gets split apart, but completely unrelated code ends up combined in a single method. This makes it too easy to introduce bugs and inconsistencies.
 
 `Motive : To keep all the related code like making api call etc at one place to avoid bugs and inconsistencies`
+`Hook introduced : Effect Hook`
 
 </details>
 
 <details> 
 <summary>Classes can be difficult to understand</summary>
 
-In addition to making code reuse and code organization more difficult, we’ve found that classes can be a large barrier to learning React. You have to understand **how this works in JavaScript**, which is very different from how it works in most languages. You have to remember to bind the event handlers.The distinction between function and class components in React and when to use each one leads to disagreements even between experienced React developers.Additionally, React has been out for about five years, and we want to make sure **it stays relevant in the next five years**. [Ahead-of-time](https://en.wikipedia.org/wiki/Ahead-of-time_compilation) compilation of components has a lot of future potential.Recently, we’ve been experimenting with [component folding](https://github.com/facebook/react/issues/7323) using [Prepack](https://prepack.io/), and we’ve seen promising early results.**Classes don’t minify very well, and they make hot reloading flaky and unreliable.**
+In addition to making code reuse and code organization more difficult, we’ve found that classes can be a large barrier to learning React. You have to understand **how "this" works in JavaScript**, which is very different from how it works in most languages. You have to remember to bind the event handlers.The distinction between function and class components in React and when to use each one leads to disagreements even between experienced React developers.Additionally, React has been out for about five years, and we want to make sure **it stays relevant in the next five years**. [Ahead-of-time](https://en.wikipedia.org/wiki/Ahead-of-time_compilation) compilation of components has a lot of future potential.Recently, we’ve been experimenting with [component folding](https://github.com/facebook/react/issues/7323) using [Prepack](https://prepack.io/), and we’ve seen promising early results.**Classes don’t minify very well, and they make hot reloading flaky and unreliable.**
 
 `Motive : All in all classed pose a challenge in the react ecosystem and otherwise in javascript itself. These chalenges are like understanding this, minification and hot reload issues and they also pose a challenge in the AOT compilation of code. So to resolve all these issue without taking away the functional power of classes, the hooks have been introduced.`
 
@@ -541,7 +543,7 @@ const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
 - **Basic Rule for Custom Hooks**
 
   1. Name of every custom hook should start with **use**, so that react can identify that the function is a hook.
-  2. Every call to a custom hook has its own isolated state. So calling the same custom hook from 2 different components or the same component will create 2 isolated state.
+  2. **Every call to a custom hook has its own isolated state**. So calling the same custom hook from 2 different components or the same component will create 2 isolated state.
   3. 2 components sharing same hook(custom hook) don't share the state.
   4. Every custom hook takes an input and returns an output.
   5. You can pass the result of one hook into another. This is general to all hooks not specific to custom hook.
@@ -623,15 +625,113 @@ function useReducer(reducer, initialState) {
 
 > useReducer
 > const [state, dispatch] = useReducer(reducer, initialArg, init);
+> Accepts a **reducer** of type (state, action) => newState, and returns the current state paired with a dispatch method.
 
-- **Solves**
+1. useReducer is usually preferable to useState when
+   - there is complex state logic that involves multiple sub-values
+   - next state depends on the previous one.
+2. useReducer also lets you optimize performance for components that trigger deep updates because you can pass dispatch down instead of callbacks.
 
-  1. useReducer is usually preferable to useState when you have complex state logic that involves multiple sub-values or when the next state depends on the previous one.
-  2. useReducer also lets you optimize performance for components that trigger deep updates because you can pass dispatch down instead of callbacks.
+```javascript
+const initialState = { count: 0 };
 
-- **Earlier Counterparts**
+function reducer(state, action) {
+  switch (action.type) {
+    case "increment":
+      return { count: state.count + 1 };
+    case "decrement":
+      return { count: state.count - 1 };
+    default:
+      throw new Error();
+  }
+}
 
-- **Difference from Earlier Counterparts**
+function Counter() {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  return (
+    <>
+      Count: {state.count}
+      <button onClick={() => dispatch({ type: "decrement" })}>-</button>
+      <button onClick={() => dispatch({ type: "increment" })}>+</button>
+    </>
+  );
+}
+```
+
+3.  **Initialize state** : There are 3 ways to initialize the state
+
+    - **By passing initialState as 2nd argument to useReducer** :
+
+      ```javascript
+      const [state, dispatch] = useReducer(reducer, { count: initialCount });
+      ```
+
+    - **By providing it as default state to reducer function** :
+
+      ```javascript
+      function reducer(state = { count: 0 }, action) {
+        switch (action.type) {
+          case "increment":
+            return { count: state.count + 1 };
+          case "decrement":
+            return { count: state.count - 1 };
+          default:
+            throw new Error();
+        }
+      }
+      useReducer(reducer, undefined, reducer);
+      ```
+
+      > React doesn’t use the state = initialState argument convention popularized by Redux. The initial value sometimes needs to depend on props and so is specified from the Hook call instead. If you feel strongly about this, you can call useReducer(reducer, undefined, reducer) to emulate the Redux behavior, but it’s not encouraged.
+
+    - **Lazy state initialization**
+      You can also create the initial state lazily. To do this, you can pass an **init** function as the third argument. The initial state will be set to **init(initialArg)**.
+
+      1. It lets you extract the logic for calculating the initial state outside the reducer.
+      2. This is also handy for resetting the state later in response to an action as done on reset in the below example
+
+         ```javascript
+         function init(initialCount) {
+           return { count: initialCount };
+         }
+
+         function reducer(state, action) {
+           switch (action.type) {
+             case "increment":
+               return { count: state.count + 1 };
+             case "decrement":
+               return { count: state.count - 1 };
+             case "reset":
+               return init(action.payload);
+             default:
+               throw new Error();
+           }
+         }
+
+         function Counter({ initialCount }) {
+           const [state, dispatch] = useReducer(reducer, initialCount, init);
+           return (
+             <>
+               Count: {state.count}
+               <button
+                 onClick={() =>
+                   dispatch({ type: "reset", payload: initialCount })
+                 }
+               >
+                 Reset
+               </button>
+               <button onClick={() => dispatch({ type: "decrement" })}>
+                 -
+               </button>
+               <button onClick={() => dispatch({ type: "increment" })}>+</button>
+             </>
+           );
+         }
+         ```
+
+4.  **Bailing out of a dispatch** : If you return the same value from a Reducer Hook as the current state, React will
+    - bail out without rendering the children or firing effects. (React uses the Object.is comparison algorithm.)
+    - still need to render that specific component again before bailing out. That shouldn’t be a concern because React won’t unnecessarily go “deeper” into the tree. If you’re doing expensive calculations while rendering, you can optimize them with useMemo.
 
 </details>
 
@@ -641,6 +741,7 @@ function useReducer(reducer, initialState) {
 [Dead-code elimination](https://en.wikipedia.org/wiki/Dead_code_elimination)
 
 </details>
+
 <details>
 <summary><b>CONTEXT</b></summary>
 
@@ -886,5 +987,233 @@ function Content() {
 ```
 
 </details>
+
+</details>
+
+<details>
+<summary> <b>REF</b></summary>
+
+### Why ref?
+
+In the typical React dataflow, props are the only way that parent components interact with their children. To modify a child, you re-render it with new props. However, there are a few cases where you need to imperatively modify a child outside of the typical dataflow. The child to be modified could be an instance of a React component, or it could be a DOM element. For both of these cases, React provides an escape hatch ie ref. Few use cases :
+
+- Get elements position and dimension to do some task.
+- Integration with third party dom library.
+- Trigger Imperative animations
+- Managing focus, text selection.
+
+### Different Types of ref
+
+1. **ref to a DOM element**
+   When the ref attribute is used on an HTML element, the ref receives the underlying DOM element as its current property.
+2. **ref to a React class component**
+   When the ref attribute is used on a custom class component, the ref object receives the mounted instance of the component as its current property. Note that the below code only works if `CustomTextInput` is declared as a class:
+
+   Here we use a ref to get access to the CustomTextInput and call its focusTextInput method manually
+
+   ```javascript
+   class AutoFocusTextInput extends React.Component {
+     constructor(props) {
+       super(props);
+       this.textInput = React.createRef();
+     }
+     componentDidMount() {
+       this.textInput.current.focusTextInput();
+     }
+     render() {
+       return <CustomTextInput ref={this.textInput} />;
+     }
+   }
+
+   class CustomTextInput extends React.Component {
+     focusTextInput() {}
+     // ...
+   }
+   ```
+
+3. **ref to a React functional component** :
+   Although you may not use the ref attribute on function components by default as they don’t have instances, but you can achieve this using `forwardRef` in conjunction with `useImperativeHandle`.
+
+   ```javascript
+   function FancyInput(props, ref) {
+     const inputRef = useRef();
+     useImperativeHandle(ref, () => ({
+       focus: () => {
+         inputRef.current.focus();
+       }
+     }));
+     return <input ref={inputRef} ... />;
+   }
+   FancyInput = forwardRef(FancyInput);
+   ```
+
+### Ways to add ref
+
+<details>
+<summary> <b>createRef api</b></summary>
+
+> Create : React.createRef
+
+> Access : this.textInput.current
+
+> Use In : Class Components
+
+Refs are created using `React.createRef()` and attached to React elements via the `ref` attribute. Refs are commonly assigned to an instance property when a component is constructed so they can be referenced throughout the component.
+
+```javascript
+class CreateRef extends React.Component {
+  constructor(props) {
+    super(props);
+    this.textInput = React.createRef();
+    this.focusTextInput = this.focusTextInput.bind(this);
+  }
+
+  focusTextInput() {
+    this.textInput.current.focus();
+  }
+
+  componentDidMount() {
+    this.focusTextInput();
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="text" ref={this.textInput} />
+        <input
+          type="button"
+          value="Focus the text input"
+          onClick={this.focusTextInput}
+        />
+      </div>
+    );
+  }
+}
+```
+
+</details>
+
+<details>
+<summary> <b>callback as ref</b></summary>
+
+> Create : using callback
+
+> Access : this.textInput.current
+
+> Use In : Class Components
+
+Instead of passing a ref attribute created by createRef(), you pass a function. The function receives the React component instance or HTML DOM element as its argument, which can be stored and accessed elsewhere.
+
+React will call the ref callback with the DOM element when the component mounts, and call it with null when it unmounts. Refs are guaranteed to be up-to-date before componentDidMount or componentDidUpdate fires.
+
+```javascript
+export class CallbackRef extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.textInput = null;
+
+    this.setTextInputRef = element => {
+      this.textInput = element;
+    };
+
+    this.focusTextInput = () => {
+      if (this.textInput) this.textInput.focus();
+    };
+  }
+
+  componentDidMount() {
+    this.focusTextInput();
+  }
+
+  render() {
+    return (
+      <div>
+        <input type="text" ref={this.setTextInputRef} />
+        <input
+          type="button"
+          value="Focus the text input"
+          onClick={this.focusTextInput}
+        />
+      </div>
+    );
+  }
+}
+```
+
+> If the ref callback is defined as an inline function, it will get called twice during updates, first with null and then again with the DOM element. This is because a new instance of the function is created with each render, so React needs to clear the old ref and set up the new one. You can avoid this by defining the ref callback as a bound method on the class, but note that it shouldn’t matter in most cases.
+
+</details>
+
+<details>
+<summary> <b>useRef hook</b></summary>
+
+> Create : useRef hook Eg const textInput = useRef(null)
+
+> Access : textInput
+
+> Use In : Functional Components
+
+useRef is a hook introduced to access ref in a functional component as well.
+useRef returns a mutable ref object whose .current property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
+
+```javascript
+export const UseRef = () => {
+  const textInput = useRef(null);
+  const focusTextInput = () => textInput.current.focus();
+  useEffect(() => {
+    focusTextInput();
+  }, []);
+  return (
+    <div>
+      <input type="text" ref={textInput} />
+      <input
+        type="button"
+        value="Focus the text input"
+        onClick={focusTextInput}
+      />
+    </div>
+  );
+};
+```
+
+</details>
+
+<details>
+<summary> <b>legacy ref as string</b></summary>
+
+> Create : string Eg ref="textInput"
+
+> Access : this.ref.textInput
+
+> Use In : Class Components
+
+This is a legacy way to add refs. The ref attribute is a string, like "textInput", and the DOM node is accessed as this.refs.textInput. **We advise against it because string refs have some issues, are considered legacy**, and are likely to be removed in one of the future releases.
+
+</details>
+
+### Ways to Forwarding ref
+
+Sometimes we need our parent ref to have access to some dom node of its child. For this reason we need a mechanism to forward the ref of the parent to the child. This can be done by the below 2 techniques.
+
+1. **Forwarding createRef or useRef**
+2. **Forwarding callback Ref**
+   Here we pass a callback prop which we pass as ref to one of the dom node in the child component. We could also pass it as ref to any class instance in child also. This callback will then assign this dom node ref to one of instance variable(inputElement) of parent component.
+
+   ```javascript
+   function CustomTextInput(props) {
+     return (
+       <div>
+         <input ref={props.inputRef} />
+       </div>
+     );
+   }
+
+   class Parent extends React.Component {
+     render() {
+       return <CustomTextInput inputRef={el => (this.inputElement = el)} />;
+     }
+   }
+   ```
 
 </details>
