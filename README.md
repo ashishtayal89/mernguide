@@ -1049,6 +1049,10 @@ In the typical React dataflow, props are the only way that parent components int
 
 ### Ways to add ref
 
+To add a ref you access the ref attribute of an element(Dom,Class,Functional). You can pass either an **object** or a **function** to this attribute. If you pass an object(createRef,useRef) the element reference is assigned to the **current** property of the object. If you pass a function(callback ref) the element reference is passed as the first argument of the function. There is another option to pass a string in the ref attribute but it is legacy now and should not be used.
+
+> It will also work if you just pass any other object in ref attribute instead of React.createRef but it will throw a warning.
+
 <details>
 <summary> <b>createRef api</b></summary>
 
@@ -1056,7 +1060,7 @@ In the typical React dataflow, props are the only way that parent components int
 
 > Access : this.textInput.current
 
-> Use In : Class Components
+> Use In : Class Components. But can also be used in functional component.
 
 Refs are created using `React.createRef()` and attached to React elements via the `ref` attribute. Refs are commonly assigned to an instance property when a component is constructed so they can be referenced throughout the component.
 
@@ -1100,7 +1104,7 @@ class CreateRef extends React.Component {
 
 > Access : this.textInput.current
 
-> Use In : Class Components
+> Use In : Class component. But can also be used in functional component.
 
 Instead of passing a ref attribute created by createRef(), you pass a function. The function receives the React component instance or HTML DOM element as its argument, which can be stored and accessed elsewhere.
 
@@ -1152,9 +1156,9 @@ export class CallbackRef extends React.Component {
 
 > Access : textInput
 
-> Use In : Functional Components
+> Use In : Functional Components, but can also be used in class components.
 
-useRef is a hook introduced to access ref in a functional component as well.
+useRef is a hook introduced to access ref in a functional component as well. You can create a custom useRef hook also by using React.createRef and useState api.
 useRef returns a mutable ref object whose .current property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
 
 ```javascript
@@ -1196,9 +1200,29 @@ This is a legacy way to add refs. The ref attribute is a string, like "textInput
 
 Sometimes we need our parent ref to have access to some dom node of its child. For this reason we need a mechanism to forward the ref of the parent to the child. This can be done by the below 2 techniques.
 
-1. **Forwarding createRef or useRef**
+**Why** : React components hide their implementation details, including their rendered output. Other components using FancyButton usually will not need to obtain a ref to the inner button DOM element. This is good because it prevents components from relying on each other’s DOM structure too much.
+Although such encapsulation is desirable for application-level components like FeedStory or Comment, it can be inconvenient for highly reusable “leaf” components like FancyButton or MyTextInput. These components tend to be used throughout the application in a similar manner as a regular DOM button and input, and accessing their DOM nodes may be unavoidable for managing focus, selection, or animations.
+
+1. **Forwarding createRef or useRef using forwardRef**
+
+React passes the ref to the (props, ref) => ... function inside forwardRef as a second argument.The second ref argument only exists when you define a component with React.forwardRef call. Regular function or class components don’t receive the ref argument, and ref is not available in props either.
+
+In the example below, FancyButton uses React.forwardRef to obtain the ref passed to it, and then forward it to the DOM button that it renders:
+
+```javascript
+const FancyButton = React.forwardRef((props, ref) => (
+  <button ref={ref} className="FancyButton">
+    {props.children}
+  </button>
+));
+
+// You can now get a ref directly to the DOM button:
+const ref = React.createRef();
+<FancyButton ref={ref}>Click me!</FancyButton>;
+```
+
 2. **Forwarding callback Ref**
-   Here we pass a callback prop which we pass as ref to one of the dom node in the child component. We could also pass it as ref to any class instance in child also. This callback will then assign this dom node ref to one of instance variable(inputElement) of parent component.
+   Here we pass a function as a props to the child component which is used as a callback ref in the child component. This callback is then assigned as the ref attribute of one of the elements in the child component, which enable us to access this element in the parent component.
 
    ```javascript
    function CustomTextInput(props) {
@@ -1215,5 +1239,7 @@ Sometimes we need our parent ref to have access to some dom node of its child. F
      }
    }
    ```
+
+   > When you start using forwardRef in a component library, you should treat it as a breaking change and release a new major version of your library. This is because your library likely has an observably different behavior (such as what refs get assigned to, and what types are exported), and this can break apps and other libraries that depend on the old behavior. Conditionally applying React.forwardRef when it exists is also not recommended for the same reasons: it changes how your library behaves and can break your users’ apps when they upgrade React itself.
 
 </details>
