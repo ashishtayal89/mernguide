@@ -3,6 +3,10 @@ import * as UseEffect from "../features/hooks/UseEffect";
 import * as UseMemo_UseCallback from "../features/hooks/UseMemo-UseCallback";
 import * as UseContext from "../features/hooks/UseContext";
 import * as UseReducer from "../features/hooks/UseReducer";
+import * as UseRef from "../features/hooks/UseRef";
+import * as UseImperativeHandle from "../features/hooks/UseImperativeHandle";
+import * as UseDebugValue from "../features/hooks/UseDebugValue";
+import * as UseLayoutEffect from "../features/hooks/UseLayoutEffect";
 import * as CustomHooks from "../features/hooks/CustomHooks";
 import * as Context from "../features/context";
 import * as Ref from "../features/ref";
@@ -38,6 +42,26 @@ const features = [
     label: "Use Reducer",
     route: "/hooks/useReducer",
     component: moduleIterator(UseReducer)
+  },
+  {
+    label: "Use Ref",
+    route: "/hooks/useRef",
+    component: moduleIterator(UseRef)
+  },
+  {
+    label: "Use Imperative Handle",
+    route: "/hooks/useImperativeHandle",
+    component: moduleIterator(UseImperativeHandle)
+  },
+  {
+    label: "Use Layout Effect",
+    route: "/hooks/useLayoutEffect",
+    component: moduleIterator(UseLayoutEffect)
+  },
+  {
+    label: "Use Debug Value",
+    route: "/hooks/useDebugValue",
+    component: moduleIterator(UseDebugValue)
   },
   {
     label: "Custom hooks",

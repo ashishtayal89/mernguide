@@ -729,9 +729,108 @@ function Counter() {
          }
          ```
 
-4.  **Bailing out of a dispatch** : If you return the same value from a Reducer Hook as the current state, React will
-    - bail out without rendering the children or firing effects. (React uses the Object.is comparison algorithm.)
-    - still need to render that specific component again before bailing out. That shouldn’t be a concern because React won’t unnecessarily go “deeper” into the tree. If you’re doing expensive calculations while rendering, you can optimize them with useMemo.
+4.  **Bailing out of a dispatch** : If you return the same value from a Reducer Hook as the current state, React will - bail out without rendering the children or firing effects. (React uses the Object.is comparison algorithm.) - still need to render that specific component again before bailing out. That shouldn’t be a concern because React won’t unnecessarily go “deeper” into the tree. If you’re doing expensive calculations while rendering, you can optimize them with useMemo.
+
+</details>
+
+<details>
+<summary>Ref Hooks</summary>
+
+> const refContainer = useRef(initialValue);
+
+> useRef **returns a mutable ref object** whose .current property is initialized to the passed argument (initialValue). The returned object will persist for the full lifetime of the component.
+
+Look at the below example to look at the implemention of useRef.
+
+```javascript
+function TextInputWithFocusButton() {
+  const inputEl = useRef(null);
+  const onButtonClick = () => {
+    inputEl.current.focus();
+  };
+  return (
+    <>
+      <input ref={inputEl} type="text" />
+      <button onClick={onButtonClick}>Focus the input</button>
+    </>
+  );
+}
+```
+
+However, useRef() is useful for more than the ref attribute. **It’s handy for keeping any mutable value around** similar to how you’d use **instance fields in classes**. This works because useRef() creates a plain JavaScript object. The only difference between useRef() and creating a {current: ...} object yourself is that useRef will give you the same ref object on every render.
+
+| Class Intance Variable/useRef | State/useState      |
+| ----------------------------- | ------------------- |
+| Mutable                       | Immutable           |
+| No re-render on update        | Re-render on update |
+
+</details>
+
+<details>
+<summary>Imperative Handle Hooks</summary>
+
+> useImperativeHandle(ref, createHandle, [deps])
+
+useImperativeHandle customizes the instance value that is exposed to parent components when using ref.Imperative code using refs should be avoided in most cases. useImperativeHandle should be used with forwardRef:
+
+```javascript
+function FancyInput(props, ref) {
+  const inputRef = useRef();
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      inputRef.current.focus();
+    }
+  }));
+  return <input ref={inputRef} ... />;
+}
+FancyInput = forwardRef(FancyInput);
+```
+
+</details>
+
+<details>
+<summary>Layout Effect Hooks</summary>
+
+> useLayoutEffect
+
+The signature is identical to useEffect, but it fires synchronously after all DOM mutations. Use this to read layout from the DOM and synchronously re-render. Updates scheduled inside useLayoutEffect will be flushed synchronously, before the browser has a chance to paint.
+Due to its synchronous nature this effect prevents the browser from painting the dom.
+
+> If you’re migrating code from a class component, note useLayoutEffect fires in the same phase as componentDidMount and componentDidUpdate. However, we recommend starting with useEffect first and only trying useLayoutEffect if that causes a problem.
+
+> If you use server rendering, keep in mind that neither useLayoutEffect nor useEffect can run until the JavaScript is downloaded. This is why React warns when a server-rendered component contains useLayoutEffect. To fix this, either move that logic to useEffect (if it isn’t necessary for the first render), or delay showing that component until after the client renders (if the HTML looks broken until useLayoutEffect runs).To exclude a component that needs layout effects from the server-rendered HTML, render it conditionally with `showChild && <Child />` and defer showing it with `useEffect(() => { setShowChild(true); }, [])`. This way, the UI doesn’t appear broken before hydration.
+
+</details>
+
+<details>
+<summary>Debug Value Hooks</summary>
+
+> useDebugValue(value)
+
+- useDebugValue can be used to display a label for custom hooks in React DevTools.
+- It’s most valuable for custom Hooks that are part of shared libraries.
+
+```javascript
+function useFriendStatus(friendID) {
+  const [isOnline, setIsOnline] = useState(null);
+
+  // ...
+
+  // Show a label in DevTools next to this Hook
+  // e.g. "FriendStatus: Online"
+  useDebugValue(isOnline ? "Online" : "Offline");
+
+  return isOnline;
+}
+```
+
+- **Defer formatting debug values**
+  In some cases formatting a value for display might be an expensive operation. It’s also unnecessary unless a Hook is actually inspected.
+  For this reason **useDebugValue accepts a formatting function as an optional second parameter**. **This function is only called if the Hooks are inspected**. It receives the debug value as a parameter and should return a formatted display value.
+
+  ```javascript
+  useDebugValue(date, date => date.toDateString());
+  ```
 
 </details>
 
@@ -816,7 +915,7 @@ However, this isn’t the right choice in every case: moving more complexity hig
 
 - Creates a Context object.
 - When React renders a component that subscribes to this Context object it will read the current context value from the closest matching Provider above it in the tree.
-- The defaultValue argument is only used when a component does not have a matching Provider above it in the tree. This can be helpful for testing components in isolation without wrapping them. Check this out in `ThemeContext.js` file.
+- The defaultValue argument is only used when a component does not have a matching Provider above it in the tree. This can be helpful for testing components in isolation without wrapping them. Check this out in `DefaultValue.js` file.
 - Passing undefined as a Provider value does not cause consuming components to use defaultValue.
 
 </details>
@@ -1001,6 +1100,11 @@ In the typical React dataflow, props are the only way that parent components int
 - Integration with third party dom library.
 - Trigger Imperative animations
 - Managing focus, text selection.
+
+### When is a ref attached?
+
+- Class component : After render but before componentDidMount
+- Function component : Before the exection of useEffect callback.
 
 ### Different Types of ref
 
