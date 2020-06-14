@@ -1,10 +1,7 @@
-# REACT CONCEPTS
+# Creating React from scratch
 
-## Index
+This module is to focus on the internal working of react. How its virtual dom works and how it handles reconciliation.
 
-1. [Hooks,Context and Ref](https://github.com/ashishtayal89/mernguide/tree/react-hook-context)
-2. [Isomorphic React](https://github.com/ashishtayal89/mernguide/tree/react-isomorphic)
-3. [setState | jsx | eventHandler | elementVsComponent | controlledVsUncontrolled | comAndProps](https://github.com/ashishtayal89/reactbasic/tree/master/src/topics)
-4. [Build Your own react](https://github.com/ashishtayal89/mernguide/tree/react-build-your-own)
+Reference : This repo is based on [this](https://calm-meadow-57498.herokuapp.com/) blog by Didact.
 
-# REDUX CONCEPTS
+1. [Chapter 1]()
