@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "concurrently": "^5.1.0",
+    "eslint-plugin-react": "^7.20.0",
     "http-proxy-middleware": "^0.21.0",
     "nodemon": "^2.0.3"
   }
