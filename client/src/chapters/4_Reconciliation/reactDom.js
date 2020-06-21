@@ -274,48 +274,7 @@ const commitWork = fiber => {
   commitWork(fiber.sibling);
 };
 
-const workLoop = deadline => {
-  let shouldYield = false;
-  while (nextUnitOfWork && !shouldYield) {
-    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
-    shouldYield = deadline.timeRemaining() < 1;
-  }
-
-  if (!nextUnitOfWork && wipRoot) {
-    commitRoot();
-  }
-
-  requestIdleCallback(workLoop);
-};
-
-requestIdleCallback(workLoop);
-
-const performUnitOfWork = fiber => {
-  // TODO Create DOM for fiber
-  if (!fiber.dom) {
-    fiber.dom = createDom(fiber);
-  }
-
-  // TODO Create new fiber from exiting fiber
-  const elements = fiber.props.children;
-  reconcileChildren(fiber, elements);
-
-  // TODO Return next unit of work or fiber
-  if (fiber.child) {
-    return fiber.child;
-  }
-
-  let nextFiber = fiber;
-
-  while (nextFiber) {
-    if (nextFiber.sibling) {
-      return nextFiber.sibling;
-    }
-    nextFiber = nextFiber.parent;
-  }
-};
-
-function reconcileChildren(wipFiber, elements) {
+const reconcileChildren = (wipFiber, elements) => {
   let index = 0;
   let isReplaced = wipFiber.effectTag && wipFiber.effectTag === "REPLACEMENT";
   let oldFiber = isReplaced
@@ -381,7 +340,46 @@ function reconcileChildren(wipFiber, elements) {
     prevSibling = newFiber;
     index++;
   }
-}
+};
+
+const performUnitOfWork = fiber => {
+  // TODO Create DOM for fiber
+  if (!fiber.dom) {
+    fiber.dom = createDom(fiber);
+  }
+
+  // TODO Create new fiber from exiting fiber
+  const elements = fiber.props.children;
+  reconcileChildren(fiber, elements);
+
+  // TODO Return next unit of work or fiber
+  if (fiber.child) {
+    return fiber.child;
+  }
+
+  let nextFiber = fiber;
+
+  while (nextFiber) {
+    if (nextFiber.sibling) {
+      return nextFiber.sibling;
+    }
+    nextFiber = nextFiber.parent;
+  }
+};
+
+const workLoop = deadline => {
+  let shouldYield = false;
+  while (nextUnitOfWork && !shouldYield) {
+    nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
+    shouldYield = deadline.timeRemaining() < 1;
+  }
+
+  if (!nextUnitOfWork && wipRoot) {
+    commitRoot();
+  }
+
+  requestIdleCallback(workLoop);
+};
 
 const render = (element, container) => {
   wipRoot = {
@@ -394,5 +392,7 @@ const render = (element, container) => {
   deletions = [];
   nextUnitOfWork = wipRoot;
 };
+
+requestIdleCallback(workLoop);
 
 export default { render };
