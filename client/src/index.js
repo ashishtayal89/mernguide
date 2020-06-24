@@ -7,8 +7,8 @@ let update = false;
 
 // chapter1.renderApp();
 // chapter2.renderApp();
-// chapter3.renderApp();
-setInterval(() => {
-  chapter4.renderApp(update);
-  update = !update;
-}, 2000);
+chapter3.renderApp();
+// setInterval(() => {
+//   chapter4.renderApp(update);
+//   update = !update;
+// }, 2000);

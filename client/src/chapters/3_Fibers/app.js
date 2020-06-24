@@ -1,5 +1,5 @@
 import React from "./react";
-import ReactDOM from "./reactDom";
+import ReactDOM from "./reactDom/index";
 
 const renderApp = () => {
   ReactDOM.render(

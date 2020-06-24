@@ -1,4 +1,4 @@
-# Step Zero : Basic React Rendering
+# Chapter 1 : Basic React Rendering
 
 We’ll use this React app, just three lines of code. The first one defines a React element. The next one gets a node from the DOM. The last one renders the React element into the container.
 
