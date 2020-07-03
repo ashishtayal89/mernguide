@@ -13,7 +13,7 @@ A **fiber** is an object which has a reference to 3 more objects. Namely :
 2. Child
 3. Sibling
 
-Example of a fiber object is like this
+Example of a fiber object is :
 
 ```json
 {
@@ -21,14 +21,14 @@ Example of a fiber object is like this
   "props": ..., // This is an object with all the props of the element (element.props). It also contains the children which contains an array of child elements.
   "parent": ..., // This refers to its parent fiber.
   "child": ..., // This refers to its child fiber.
-  "sibling": ..., // This refers to is immidiate next sibling fiber.
+  "sibling": ..., // This refers to its immidiate next sibling fiber.
   "dom" ... // This is the dom node for this fiber.
 }
 ```
 
 ## Steps for converting the sync dom creation into async dom creation.
 
-1. Convert the root container into a fiber. This fiber will be our first unit of work. This is done in our render method. The nextUnitOfWork is the fiber we create for the root container.
+1. Convert the root container into a fiber. This fiber will be our first unit of work. This is done in our render method. The firstUnitOfWork is the fiber we create for the root container.
 
 ```javascript
 nextUnitOfWork = {

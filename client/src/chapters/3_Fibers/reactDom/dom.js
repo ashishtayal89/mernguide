@@ -1,4 +1,5 @@
 import { TEXT_ELEMENT_TYPE } from "../constants";
+
 const create = fiber => {
   const dom =
     fiber.type == TEXT_ELEMENT_TYPE
