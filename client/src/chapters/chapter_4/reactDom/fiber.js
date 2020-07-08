@@ -2,11 +2,12 @@ import { createDom, addDeletions } from "./dom";
 
 const reconcileChildren = (wipFiber, elements) => {
   let index = 0;
-  let isReplaced = wipFiber.effectTag && wipFiber.effectTag === "REPLACEMENT";
-  let oldFiber = isReplaced
-    ? null
-    : wipFiber.alternate && wipFiber.alternate.child;
   let prevSibling = null;
+
+  let oldFiber = wipFiber.alternate && wipFiber.alternate.child;
+  if (wipFiber.effectTag === "REPLACEMENT") {
+    oldFiber = null;
+  }
 
   while (index < elements.length || oldFiber != null) {
     const element = elements[index];
@@ -16,14 +17,6 @@ const reconcileChildren = (wipFiber, elements) => {
       // TODO delete the oldFiber's node
       oldFiber.effectTag = "DELETION";
       addDeletions(oldFiber);
-      //   newFiber = {
-      //     type: oldFiber.type,
-      //     props: oldFiber.props,
-      //     alternate: oldFiber,
-      //     dom: oldFiber.dom,
-      //     parent: oldFiber.parent,
-      //     effectTag: "DELETION"
-      //   };
     }
 
     if (element && !oldFiber) {
@@ -70,7 +63,7 @@ const reconcileChildren = (wipFiber, elements) => {
 
     if (index === 0) {
       wipFiber.child = newFiber;
-    } else {
+    } else if (prevSibling) {
       prevSibling.sibling = newFiber;
     }
     prevSibling = newFiber;

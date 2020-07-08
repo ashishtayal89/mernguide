@@ -16,11 +16,8 @@ const workLoop = deadline => {
     nextUnitOfWork = performUnitOfWork(nextUnitOfWork);
     shouldYield = deadline.timeRemaining() < 1;
   }
-
   if (!nextUnitOfWork && getWipRoot()) {
     commitRoot();
   }
-  if (nextUnitOfWork) {
-    requestIdleCallback(workLoop);
-  }
+  requestIdleCallback(workLoop);
 };

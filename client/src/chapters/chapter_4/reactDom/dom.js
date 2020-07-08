@@ -30,6 +30,13 @@ export const createDom = fiber => {
       dom[name] = fiber.props[name];
     });
 
+  Object.keys(fiber.props)
+    .filter(isEvent)
+    .forEach(name => {
+      const eventType = name.toLowerCase().substring(2);
+      dom.addEventListener(eventType, fiber.props[name]);
+    });
+
   return dom;
 };
 
@@ -37,7 +44,7 @@ const updateDom = (dom, prevProps, nextProps) => {
   //Remove old or changed event listeners
   Object.keys(prevProps)
     .filter(isEvent)
-    .filter(key => !(key in nextProps) || isNew(prevProps, nextProps)(key))
+    .filter(key => isGone(nextProps)(key) || isNew(prevProps, nextProps)(key))
     .forEach(name => {
       const eventType = name.toLowerCase().substring(2);
       dom.removeEventListener(eventType, prevProps[name]);
@@ -71,14 +78,16 @@ const commitWork = fiber => {
     return;
   }
   const domParent = fiber.parent.dom;
-  if (fiber.effectTag === "PLACEMENT" && fiber.dom != null) {
-    domParent.appendChild(fiber.dom);
-  } else if (fiber.effectTag === "UPDATE" && fiber.dom != null) {
-    updateDom(fiber.dom, fiber.alternate.props, fiber.props);
-  } else if (fiber.effectTag === "REPLACEMENT") {
-    domParent.replaceChild(fiber.dom, fiber.alternate.dom);
-  } else if (fiber.effectTag === "DELETION") {
-    return domParent.removeChild(fiber.dom);
+  if (fiber.dom) {
+    if (fiber.effectTag === "PLACEMENT") {
+      domParent.appendChild(fiber.dom);
+    } else if (fiber.effectTag === "UPDATE") {
+      updateDom(fiber.dom, fiber.alternate.props, fiber.props);
+    } else if (fiber.effectTag === "REPLACEMENT") {
+      domParent.replaceChild(fiber.dom, fiber.alternate.dom);
+    } else if (fiber.effectTag === "DELETION") {
+      return domParent.removeChild(fiber.dom);
+    }
   }
   commitWork(fiber.child);
   commitWork(fiber.sibling);

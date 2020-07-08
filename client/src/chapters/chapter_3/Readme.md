@@ -1,4 +1,4 @@
-# Chapter 3 : Creating units of work using fiber.
+# Chapter 3 : Fibers.
 
 In the previous chapter we did below two tasks :
 

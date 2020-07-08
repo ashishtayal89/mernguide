@@ -6,14 +6,18 @@ const renderApp = update => {
     <div id="parent2">
       <h2 title="child">Chapter 4 (Reconciliation)</h2>
       <span id="span1">span1</span>
-      <div id="div2">div2</div>
+      <div id="div2" onclick={() => alert("Update 1")}>
+        div2
+      </div>
       <span id="span2">span2</span>
     </div>
   ) : (
     <div id="parent2">
       <h2 title="child">Chapter 4 (Reconciliation)</h2>
       <div id="div1">div1</div>
-      <div id="div3">div2</div>
+      <div id="div3" onclick={() => alert("Reset")}>
+        div2
+      </div>
     </div>
   );
   ReactDOM.render(element, document.getElementById("chapter4"));
