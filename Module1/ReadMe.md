@@ -32,6 +32,12 @@ Libraries that made node JS a viable option to pick for backend development.
 V8 is a JS interpreter which converts JS into machine code and executes it.
 The browsers just sends the JS files to the JS engines V8 to execute them. Similarly Node just sends the JS files to V8 to execute them.
 
+Other JS Engines
+
+1. SpiderMonkey : Mozilla
+2. JavascriptCore : Safari
+3. Chakra : IE
+
 ### Node JS
 
 Node JS is a server side JS runtime environment. Node is a c++ application that embeds V8. So basically Node takes care of the higher level task like providing the code to V8 then capturing its response etc.
