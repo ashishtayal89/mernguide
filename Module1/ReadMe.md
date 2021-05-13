@@ -70,7 +70,7 @@ When you start node by executing `node index.js` the node first starts an event 
 4. Testing scripts are commonly held in a /test directory and are triggered by a test runner such as Mocha.
 5. abc.yml : CI and CD deployment and testing file.
 6. Linting files like .jshintrc
-7. The linting, bundling, testing can be controlled by task runner like grunt or gulp
+7. The linting, bundling, testing can be controlled by task runner like grunt or gulp. These days we have webpack as an alternative to these in the form of a app bundler.
 8. Source control .gitignore and .git
 9. Code comments like @Param, @TODO, @Author, @Date
 10. Environment : How to fetch ennvironment specific configuration for a node application
@@ -89,3 +89,6 @@ When you start node by executing `node index.js` the node first starts an event 
     3. Avoid creating globals since a global declared in 1 package can conflict with the one created in another package.
 
 ### Node vs Browser
+
+- Node doesn't have cross browser issues since it uses only 1 JS engine compared to differene engines used by different browsers.
+- Node doesn't have access to a lot of global window objects like document, location, navigation etc.

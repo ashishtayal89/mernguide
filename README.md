@@ -1,5 +1,9 @@
 # Create a Hiring management portal
 
+## Name
+
+**HIREME**, **BINGOO**
+
 ## Features
 
 1. Allows creation of candidate profile.
