@@ -1,18 +1,19 @@
 // Get the environment name for NODE_ENV command line argument.
 const env = process.env.NODE_ENV;
-console.log(env);
 
 // All the environments
 const environments = {
   staging: {
     httpPort: 3000,
     httpsPort: 3001,
-    envName: "staging"
+    envName: "staging",
+    hashingSecret: "stagingHashSecret"
   },
   production: {
     httpPort: 5000,
     httpsPort: 5001,
-    envName: "production"
+    envName: "production",
+    hashingSecret: "productionHashSecret"
   }
 };
 

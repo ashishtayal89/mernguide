@@ -78,7 +78,7 @@ const unifiedServer = function(req, res) {
     // Allow customheader
     res.setHeader(
       "Access-Control-Allow-Headers",
-      "Origin, X-Requested-With, Content-Type, Accept,customheader"
+      "Origin, X-Requested-With, Content-Type, Accept, customheader, token"
     );
     // Allow all request methods ie get post put delete
     res.setHeader("Access-Control-Allow-Methods", "*");
