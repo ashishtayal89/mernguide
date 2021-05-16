@@ -64,10 +64,73 @@ fetch(`http://localhost:3000/foo?name=Ashish`, {
 
 ### Store Data
 
-1. Since we are not using any data base for this application we are managing all the data in the filesystem. For that we have created a folder `.data` which will hold all the data related files in it. So this folder acts as a database for us. Inside this filder we will have different subdirectories which would represent different collections of a database Eg Users folder would hold all the data files related to a user.
+1. Since we are not using any data base for this application we are managing all the data in the filesystem. For that we have created a folder `.data` which will hold all the data related files in it. So this folder acts as a database for us. Inside this folder we will have different subdirectories which would represent different tables of a database Eg Users folder would hold all the data files related to a user. These data files represent single record in a RDBMS.
 
 2. Secondly we create a lib folder which would have all the libraries of this project. Inside this folder we create a file `data.js` which contains all the CRUD operation to perform on the data files.
 
 ### User Service
 
 1. In this section we will be creating an api which will be responsibe to do different user operation. We start by first moving the handlers logic out of the index file to a `handler.js` lib file.
+
+- Sample User Request
+
+```javascript
+fetch(`http://localhost:3000/users`, {
+  method: "POST",
+  mode: "cors",
+  cache: "no-cache",
+  credentials: "same-origin",
+  headers: {
+    customHeader: "This is custom header"
+  },
+  body: JSON.stringify({
+    firstName: "Ashish",
+    lastName: "Tayal",
+    phone: "9822889472",
+    password: "123",
+    tosAgreement: true
+  })
+});
+```
+
+### Tokens Service
+
+- Sample Token Request
+
+```javascript
+fetch(`http://localhost:3000/tokens`, {
+  method: "POST",
+  mode: "cors",
+  cache: "no-cache",
+  credentials: "same-origin",
+  headers: {
+    customHeader: "This is custom header"
+  },
+  body: JSON.stringify({ phone: "9822889472", password: "123" })
+});
+```
+
+### Checks Service
+
+- Sample Checks Request
+
+```javascript
+fetch(`http://localhost:3000/checks`, {
+  method: "POST",
+  mode: "cors",
+  cache: "no-cache",
+  credentials: "same-origin",
+  headers: { token: "6dmcp0y0l7dtrhik05ue" },
+  body: JSON.stringify({
+    protocol: "http",
+    url: "yahoo.com",
+    method: "get",
+    successCodes: [200, 201],
+    timeoutSeconds: 3
+  })
+});
+```
+
+### Connect To Api
+
+1. Generaly for any integrating with a 3rd party service you would go to their documentation and look for a npm package which supports the integraion.
