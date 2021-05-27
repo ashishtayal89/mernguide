@@ -134,3 +134,6 @@ fetch(`http://localhost:3000/checks`, {
 ### Connect To Api
 
 1. Generaly for any integrating with a 3rd party service you would go to their documentation and look for a npm package which supports the integraion.
+2. Alternatively you can craft http/https message and send them to the api/service.
+
+We are going to intergrate with a third party service called **Twilio** which we are going to use to send message to phone.

@@ -1,0 +1,9 @@
+{
+  "id": "7w3bmph5bdv0xhhvjtsr",
+  "userPhone": "9811779472",
+  "protocol": "http",
+  "url": "www.yahoo.com",
+  "method": "get",
+  "successCodes": [404],
+  "timeoutSeconds": 5
+}
