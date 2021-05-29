@@ -36,9 +36,9 @@ fetch(`http://localhost:3000/foo?name=Ashish`, {
   cache: "no-cache",
   credentials: "same-origin",
   headers: {
-    customHeader: "This is custom header"
+    customHeader: "This is custom header",
   },
-  body: JSON.stringify({ name: "Ashish" })
+  body: JSON.stringify({ name: "Ashish" }),
 });
 ```
 
@@ -81,15 +81,15 @@ fetch(`http://localhost:3000/users`, {
   cache: "no-cache",
   credentials: "same-origin",
   headers: {
-    customHeader: "This is custom header"
+    customHeader: "This is custom header",
   },
   body: JSON.stringify({
     firstName: "Ashish",
     lastName: "Tayal",
     phone: "9822889472",
     password: "123",
-    tosAgreement: true
-  })
+    tosAgreement: true,
+  }),
 });
 ```
 
@@ -104,9 +104,9 @@ fetch(`http://localhost:3000/tokens`, {
   cache: "no-cache",
   credentials: "same-origin",
   headers: {
-    customHeader: "This is custom header"
+    customHeader: "This is custom header",
   },
-  body: JSON.stringify({ phone: "9822889472", password: "123" })
+  body: JSON.stringify({ phone: "9822889472", password: "123" }),
 });
 ```
 
@@ -126,8 +126,8 @@ fetch(`http://localhost:3000/checks`, {
     url: "yahoo.com",
     method: "get",
     successCodes: [200, 201],
-    timeoutSeconds: 3
-  })
+    timeoutSeconds: 3,
+  }),
 });
 ```
 
@@ -137,3 +137,16 @@ fetch(`http://localhost:3000/checks`, {
 2. Alternatively you can craft http/https message and send them to the api/service.
 
 We are going to intergrate with a third party service called **Twilio** which we are going to use to send message to phone.
+
+### Console log
+
+- `console.log("\x1b[33m%s\x1b[0m", "Background workers are running");` : Here we are adding color to the console log for better readability. %s will be replace by the string passed as the second arguments of the log.
+
+- `util.debuglog` : This is the api exposed by node to create debug logs. It accepts an argument which acks as an identifier for the debug logs. When we pass this identifier as NODE_DEBUG environment valiable, it instructs node to only console those logs which are part of this identifier.
+
+When you start a script as `NODE_DEBUG=workers node index.js` it will console all the logs which use the debug as mentioned below.
+
+```javascript
+var util = require("util");
+var debug = util.debuglog("workers");
+```
