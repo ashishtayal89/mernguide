@@ -150,3 +150,7 @@ When you start a script as `NODE_DEBUG=workers node index.js` it will console al
 var util = require("util");
 var debug = util.debuglog("workers");
 ```
+
+## Reference
+
+https://nodejs.org/docs/latest-v15.x/api/
