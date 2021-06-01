@@ -130,6 +130,8 @@ server.router = {
   ping: handlers.ping,
   users: handlers.users,
   tokens: handlers.tokens,
+  carts: handlers.carts,
+  menuItems: handlers.menuItems,
 };
 
 server.init = function () {

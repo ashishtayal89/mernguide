@@ -1,4 +1,5 @@
 /*
+import { call } from '../../../../reactreduxreferenceapp/saga/src/sagas/mySaga/effects';
  * Request Handlers
  *
  */
@@ -123,7 +124,7 @@ handlers._users.get = function (data, callback) {
     var token =
       typeof data.headers.token == "string" ? data.headers.token : false;
     // Verify that the given token is valid for the phone number
-    handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
+    handlers._tokens.isTokenAuthentic(token, email, function (tokenIsValid) {
       if (tokenIsValid) {
         // Lookup the user
         _data.read("users", emailKey, function (err, data) {
@@ -184,7 +185,7 @@ handlers._users.put = function (data, callback) {
         typeof data.headers.token == "string" ? data.headers.token : false;
 
       // Verify that the given token is valid for the emailKey
-      handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
+      handlers._tokens.isTokenAuthentic(token, email, function (tokenIsValid) {
         if (tokenIsValid) {
           // Lookup the user
           _data.read("users", emailKey, function (err, userData) {
@@ -240,7 +241,7 @@ handlers._users.delete = function (data, callback) {
       typeof data.headers.token == "string" ? data.headers.token : false;
 
     // Verify that the given token is valid for the phone number
-    handlers._tokens.verifyToken(token, email, function (tokenIsValid) {
+    handlers._tokens.isTokenAuthentic(token, email, function (tokenIsValid) {
       if (tokenIsValid) {
         // Lookup the user
         _data.read("users", emailKey, function (err, userData) {
@@ -464,8 +465,26 @@ handlers._tokens.delete = function (data, callback) {
   }
 };
 
+// Verify if the token is still active
+handlers._tokens.isTokenActive = function (id, callback) {
+  _data.read("tokens", id, function (err, tokenData) {
+    if (!err) {
+      if (tokenData.expires > Date.now()) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    } else {
+      console.log(
+        `Could not read token or token doesn't exit. TOKEN ID : ${id}`
+      );
+      callback(false);
+    }
+  });
+};
+
 // Verify if a given token id is currently valid for a given user
-handlers._tokens.verifyToken = function (id, email, callback) {
+handlers._tokens.isTokenAuthentic = function (id, email, callback) {
   // Lookup the token
   _data.read("tokens", id, function (err, tokenData) {
     if (!err && tokenData) {
@@ -480,6 +499,97 @@ handlers._tokens.verifyToken = function (id, email, callback) {
     }
   });
 };
+
+handlers.menuItems = function (data, callback) {
+  var acceptableMethods = ["get"];
+  if (
+    acceptableMethods.indexOf(data.method) > -1 &&
+    handlers._menuItems[data.method]
+  ) {
+    handlers._menuItems[data.method](data, callback);
+  } else {
+    callback(405);
+  }
+};
+
+handlers._menuItems = {};
+
+// MenuItems - Get
+// Required data : none
+// Optional data : none
+handlers._menuItems.get = function (data, callback) {
+  const token = data.headers.token;
+  // Check if token exist in the request
+  if (token) {
+    // Check if the token is active or expired
+    handlers._tokens.isTokenActive(token, function (isTokenActive) {
+      if (isTokenActive) {
+        _data.list("menuItems", function (err, productIds) {
+          if (!err) {
+            if (productIds && productIds.length > 0) {
+              const notFetchProductIds = [];
+              const fetchedProducts = [];
+              for (const productId of productIds) {
+                _data.read("menuItems", productId, function (err, product) {
+                  if (!err) {
+                    fetchedProducts.push(product);
+                  } else {
+                    notFetchProductIds.push(productId);
+                  }
+                  if (
+                    productIds.length ===
+                    fetchedProducts.length + notFetchProductIds.length
+                  ) {
+                    if (notFetchProductIds.length > 0) {
+                      console.log(
+                        `Error fetching these products or products don't exist \n Product Ids : ${notFetchProductIds}`
+                      );
+                    }
+                    if (fetchedProducts.length > 0) {
+                      callback(200, fetchedProducts);
+                    } else {
+                      callback(500, "Error fetching products");
+                    }
+                  }
+                });
+              }
+            } else {
+              callback(200, "There is no product");
+            }
+          } else {
+            callback(500, "Error fetching products");
+          }
+        });
+      } else {
+        callback(401, "The session has timed out");
+      }
+    });
+  } else {
+    callback(401, "Please login to the application");
+  }
+};
+
+handlers.carts = function (data, callback) {
+  var acceptableMethods = ["post", "get", "put", "delete"];
+  if (
+    acceptableMethods.indexOf(data.method) > -1 &&
+    handlers._carts[data.method]
+  ) {
+    handlers._carts[data.method](data, callback);
+  } else {
+    callback(405);
+  }
+};
+
+handlers._carts = {};
+
+handlers._carts.post = function (data, callback) {};
+
+handlers._carts.get = function (data, callback) {};
+
+handlers._carts.put = function (data, callback) {};
+
+handlers._carts.delete = function (data, callback) {};
 
 // Export the handlers
 module.exports = handlers;
