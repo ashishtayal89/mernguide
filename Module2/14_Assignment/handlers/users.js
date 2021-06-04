@@ -45,7 +45,7 @@ _users.post = function (data, callback) {
   if (firstName && lastName && email && address && password && tosAgreement) {
     var emailKey = helpers.getEmailKey(email);
     // Make sure the user doesnt already exist
-    _data.read("users", emailKey, function (err, data) {
+    _data.read("users", emailKey, function (err, _data) {
       if (err) {
         // Hash the password
         var hashedPassword = helpers.hash(password);
@@ -75,7 +75,7 @@ _users.post = function (data, callback) {
       } else {
         // User alread exists
         callback(400, {
-          Error: "A user with that email number already exists",
+          Error: "A user with that email id already exists",
         });
       }
     });
