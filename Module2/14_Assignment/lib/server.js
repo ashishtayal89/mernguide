@@ -5,7 +5,7 @@ const StringDecoder = require("string_decoder").StringDecoder;
 const fs = require("fs");
 const path = require("path");
 const config = require("../lib/config");
-const handlers = require("../lib/handlers");
+const handlers = require("../handlers");
 const helpers = require("../lib/helpers");
 var util = require("util");
 var debug = util.debuglog("server");
@@ -90,7 +90,6 @@ server.unifiedServer = function (req, res) {
         typeof server.router[trimmedPath] != `undefined`
           ? server.router[trimmedPath]
           : handlers.notFound;
-
       // Route the request to data specified in the handler
       chosenHandler(data, function (statusCode, payload) {
         statusCode = typeof statusCode === "number" ? statusCode : 200;
@@ -131,7 +130,7 @@ server.router = {
   users: handlers.users,
   tokens: handlers.tokens,
   carts: handlers.carts,
-  menuItems: handlers.menuItems,
+  items: handlers.items,
 };
 
 server.init = function () {
