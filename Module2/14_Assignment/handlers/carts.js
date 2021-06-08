@@ -13,14 +13,14 @@ const _carts = {};
 _carts.post = function (requestData, callback) {
   const itemId =
     typeof requestData.payload.itemId === "string" &&
-    requestData.payload.itemId.length === 10
+      requestData.payload.itemId.length === 10
       ? requestData.payload.itemId
       : false;
   const quantity =
     typeof requestData.payload.quantity === "number" &&
-    requestData.payload.quantity > 0 &&
-    requestData.payload.quantity < 50 &&
-    requestData.payload.quantity % 1 === 0
+      requestData.payload.quantity > 0 &&
+      requestData.payload.quantity < 50 &&
+      requestData.payload.quantity % 1 === 0
       ? requestData.payload.quantity
       : false;
   if (itemId && quantity) {
@@ -102,7 +102,7 @@ _carts.post = function (requestData, callback) {
 _carts.get = function (requestData, callback) {
   const cartId =
     typeof requestData.queryStringObject.id === "string" &&
-    requestData.queryStringObject.id.length === 15
+      requestData.queryStringObject.id.length === 15
       ? requestData.queryStringObject.id
       : false;
   if (cartId) {
@@ -155,19 +155,19 @@ _carts.get = function (requestData, callback) {
 _carts.put = function (requestData, callback) {
   const cartId =
     typeof requestData.payload.id === "string" &&
-    requestData.payload.id.length === 15
+      requestData.payload.id.length === 15
       ? requestData.payload.id
       : false;
   const itemId =
     typeof requestData.payload.itemId === "string" &&
-    requestData.payload.itemId.length === 10
+      requestData.payload.itemId.length === 10
       ? requestData.payload.itemId
       : false;
   const quantity =
     typeof requestData.payload.quantity === "number" &&
-    requestData.payload.quantity > 0 &&
-    requestData.payload.quantity < 50 &&
-    requestData.payload.quantity % 1 === 0
+      requestData.payload.quantity > 0 &&
+      requestData.payload.quantity < 50 &&
+      requestData.payload.quantity % 1 === 0
       ? requestData.payload.quantity
       : false;
   if (cartId && itemId && quantity) {
@@ -243,7 +243,7 @@ _carts.put = function (requestData, callback) {
 _carts.delete = function (requestData, callback) {
   const cartId =
     typeof requestData.queryStringObject.id === "string" &&
-    requestData.queryStringObject.id.length === 15
+      requestData.queryStringObject.id.length === 15
       ? requestData.queryStringObject.id
       : false;
   if (cartId) {
