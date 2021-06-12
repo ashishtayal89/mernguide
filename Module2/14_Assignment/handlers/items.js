@@ -5,7 +5,7 @@ const tokensHandler = require("./tokens");
 // Contains private methods for items
 const _items = {};
 
-// MenuItems - Get
+// Items - Get
 // Required data : none
 // Optional data : none
 _items.get = function (data, callback) {

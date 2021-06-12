@@ -7,6 +7,29 @@ var debug = util.debuglog("carts");
 // Contains private method to cart
 const _carts = {};
 
+// Private Method
+// Fetch ttems detail for cart items
+_carts.getItemsDetailForCartItems = (cartItems, callback) => {
+  let itemCount = 0;
+  const itemsDetail = [];
+  const itemIds = Object.keys(cartItems);
+  itemIds.map(itemId => {
+    _data.read("items", itemId, function (err, itemData) {
+      itemCount++;
+      if (!err) {
+        let itemDetail = { ...itemData, quantity: cartItems[itemId] }
+        itemsDetail.push(itemDetail);
+      } else {
+        console.log(`Error reading item with id : ${itemId}`);
+      }
+      if (itemCount === itemIds.length) {
+        callback(itemsDetail);
+      }
+    })
+  })
+}
+
+
 // POST
 // Required: itemId, quantity
 // Optional: none
@@ -24,24 +47,26 @@ _carts.post = function (requestData, callback) {
       ? requestData.payload.quantity
       : false;
   if (itemId && quantity) {
-    _data.read("items", itemId, function (err, _itemsData) {
-      if (!err) {
-        const token = requestData.headers.token;
-        tokensHandler.isTokenActive(token, function (isActive) {
-          if (isActive) {
+    const token = requestData.headers.token;
+    tokensHandler.isTokenActive(token, function (isActive) {
+      if (isActive) {
+        _data.read("items", itemId, function (err, _itemsData) {
+          if (!err) {
             _data.read("tokens", token, function (err, tokenData) {
               if (!err) {
                 const email = tokenData.email;
                 const emailKey = helpers.getEmailKey(email);
                 _data.read("users", emailKey, function (err, userData) {
                   if (!err) {
-                    if (!userData.cartId) {
-                      const cartId = helpers.createRandomString(15);
+                    let cartId = userData.cartId;
+                    if (!cartId) {
+                      cartId = helpers.createRandomString(15);
                       const cartData = {
                         cartItems: {
                           [itemId]: quantity,
                         },
-                        email,
+                        created_Date: Date.now(),
+                        email
                       };
                       _data.create("carts", cartId, cartData, function (err) {
                         if (!err) {
@@ -52,7 +77,9 @@ _carts.post = function (requestData, callback) {
                             userData,
                             function (err) {
                               if (!err) {
-                                callback(200, { cartId });
+                                _carts.getItemsDetailForCartItems({ [itemId]: quantity, }, (itemsDetail) => {
+                                  callback(200, itemsDetail);
+                                })
                               } else {
                                 debug(
                                   `Error updating user ${emailKey} with cartId ${cartId}`
@@ -71,7 +98,28 @@ _carts.post = function (requestData, callback) {
                         }
                       });
                     } else {
-                      callback(400, { Error: "Cart already exits" });
+                      _data.read("carts", cartId, function (err, cartData) {
+                        if (!err) {
+                          cartData = {
+                            ...cartData,
+                            cartItems: { ...cartData.cartItems, [itemId]: quantity },
+                          };
+                          _data.update("carts", cartId, cartData, function (err) {
+                            if (!err) {
+                              _carts.getItemsDetailForCartItems(cartData.cartItems, (itemsDetail) => {
+                                callback(200, itemsDetail);
+                              });
+                            } else {
+                              debug(`Error updating the cart with id ${cartId} for user ${emailKey}`);
+                              callback(500, { Error: "Internal Server Error" });
+                            }
+                          });
+                        }
+                        else {
+                          debug(`Error reading from cart ${cartId}`);
+                          callback(500, { Error: "Internal Server error" });
+                        }
+                      });
                     }
                   } else {
                     debug(`Error fetching user ${email}`);
@@ -84,11 +132,11 @@ _carts.post = function (requestData, callback) {
               }
             });
           } else {
-            callback(403, "Not Autorized");
+            callback(400, { Error: "Item doen't exist" });
           }
         });
       } else {
-        callback(400, { Error: "Item doen't exist" });
+        callback(403, "Not Autorized");
       }
     });
   } else {
@@ -97,213 +145,126 @@ _carts.post = function (requestData, callback) {
 };
 
 // GET
-// Required: id
+// Required: none
 // Optional: none
 _carts.get = function (requestData, callback) {
-  const cartId =
-    typeof requestData.queryStringObject.id === "string" &&
-      requestData.queryStringObject.id.length === 15
-      ? requestData.queryStringObject.id
-      : false;
-  if (cartId) {
-    const token = requestData.headers.token;
-    _data.read("carts", cartId, function (err, cartData) {
-      if (!err) {
-        tokensHandler.isTokenAuthentic(
-          token,
-          cartData.email,
-          function (isAuthentic) {
-            if (isAuthentic) {
-              let { cartItems } = cartData;
-              const finalCartItems = [];
-              const totalItemsCount = Object.keys(cartItems).length;
-              let currentItemCount = 0;
-              for (let itemId in cartItems) {
-                _data.read("items", itemId, function (err, itemData) {
-                  currentItemCount++;
+  const token = requestData.headers.token;
+  tokensHandler.isTokenActive(token, function (isActive) {
+    if (isActive) {
+      _data.read("tokens", token, function (err, tokenData) {
+        if (!err) {
+          const email = tokenData.email;
+          const emailKey = helpers.getEmailKey(email);
+          _data.read("users", emailKey, function (err, userData) {
+            if (!err) {
+              let cartId = userData.cartId;
+              if (cartId) {
+                _data.read("carts", cartId, function (err, cartData) {
                   if (!err) {
-                    finalCartItems.push({
-                      ...itemData,
-                      quantity: cartItems[itemId],
+                    _carts.getItemsDetailForCartItems(cartData.cartItems, (itemsDetail) => {
+                      callback(200, itemsDetail);
                     });
-                    if (currentItemCount === totalItemsCount) {
-                      callback(200, finalCartItems);
-                    }
-                  } else {
-                    debug(`Error fetching item ${itemId}`);
+                  }
+                  else {
+                    debug(`Error reading from cart ${cartId}`);
+                    callback(500, { Error: "Internal Server error" });
                   }
                 });
+              } else {
+                callback(400, { Error: "No item in the cart" });
               }
             } else {
-              callback(403, { Error: "Not Authorized" });
+              debug(`Error fetching user ${email}`);
+              callback(500, { Error: "Internal Server Error" });
             }
-          }
-        );
-      } else {
-        debug(`Error reading from cart ${cartId}`);
-        callback(400, { Error: "Cart doesn't exit with this id" });
-      }
-    });
-  } else {
-    callback(400, { Error: "Invalid cart Id" });
-  }
-};
-
-// PUT
-// Required: id, itemId, quantity
-// Optional: none
-_carts.put = function (requestData, callback) {
-  const cartId =
-    typeof requestData.payload.id === "string" &&
-      requestData.payload.id.length === 15
-      ? requestData.payload.id
-      : false;
-  const itemId =
-    typeof requestData.payload.itemId === "string" &&
-      requestData.payload.itemId.length === 10
-      ? requestData.payload.itemId
-      : false;
-  const quantity =
-    typeof requestData.payload.quantity === "number" &&
-      requestData.payload.quantity > 0 &&
-      requestData.payload.quantity < 50 &&
-      requestData.payload.quantity % 1 === 0
-      ? requestData.payload.quantity
-      : false;
-  if (cartId && itemId && quantity) {
-    const token = requestData.headers.token;
-    _data.read("carts", cartId, function (err, cartData) {
-      if (!err) {
-        tokensHandler.isTokenAuthentic(
-          token,
-          cartData.email,
-          function (isAuthentic) {
-            if (isAuthentic) {
-              _data.read("items", itemId, function (err, _itemsData) {
-                if (!err) {
-                  let { cartItems } = cartData;
-                  if (quantity === 0) {
-                    delete cartItems[itemId];
-                  } else {
-                    cartItems = { ...cartData.cartItems, [itemId]: quantity };
-                  }
-                  cartData = {
-                    ...cartData,
-                    cartItems,
-                  };
-                  _data.update("carts", cartId, cartData, function (err) {
-                    if (!err) {
-                      let { cartItems } = cartData;
-                      const finalCartItems = [];
-                      const totalItemsCount = Object.keys(cartItems).length;
-                      let currentItemCount = 0;
-                      for (let itemId in cartItems) {
-                        _data.read("items", itemId, function (err, itemData) {
-                          currentItemCount++;
-                          if (!err) {
-                            finalCartItems.push({
-                              ...itemData,
-                              quantity: cartItems[itemId],
-                            });
-                            if (currentItemCount === totalItemsCount) {
-                              callback(200, finalCartItems);
-                            }
-                          } else {
-                            debug(`Error fetching item ${itemId}`);
-                          }
-                        });
-                      }
-                    } else {
-                      debug(`Error updating the cart with id ${cartId}`);
-                      callback(500, { Error: "Internal Server Error" });
-                    }
-                  });
-                } else {
-                  callback(400, { Error: "Item doen't exist" });
-                }
-              });
-            } else {
-              callback(403, { Error: "Not Authorized" });
-            }
-          }
-        );
-      } else {
-        debug(`Error reading from cart ${cartId}`);
-        callback(400, { Error: "Cart doesn't exit with this id" });
-      }
-    });
-  } else {
-    callback(400, { Error: "Invalid or missing fields id, itemId, quantity" });
-  }
-};
+          });
+        } else {
+          debug(`Error fetching token ${token}`);
+          callback(500, { Error: "Internal Server Error" });
+        }
+      });
+    } else {
+      callback(403, "Not Autorized");
+    }
+  });
+}
 
 // DELETE
-// Required: id
-// Optional: none
+// Required: none
+// Optional: itemIds, deleteAll
 _carts.delete = function (requestData, callback) {
-  const cartId =
-    typeof requestData.queryStringObject.id === "string" &&
-      requestData.queryStringObject.id.length === 15
-      ? requestData.queryStringObject.id
-      : false;
-  if (cartId) {
+  const deleteAll = typeof requestData.payload.deleteAll === "boolean" ? requestData.payload.deleteAll : false;
+  const itemIds = typeof requestData.payload.itemIds === "object"
+    && requestData.payload.itemIds.length
+    && requestData.payload.itemIds.length > 0 ?
+    requestData.payload.itemIds : false;
+  if (deleteAll || itemIds) {
     const token = requestData.headers.token;
-    _data.read("carts", cartId, function (err, cartData) {
-      if (!err) {
-        tokensHandler.isTokenAuthentic(
-          token,
-          cartData.email,
-          function (isAuthentic) {
-            if (isAuthentic) {
-              _data.delete("carts", cartId, function (err) {
-                if (!err) {
-                  const emailKey = helpers.getEmailKey(cartData.email);
-                  _data.read("users", emailKey, function (err, userData) {
-                    if (!err) {
-                      const { cartId, ...userDataWithoutCart } = userData;
-                      _data.update(
-                        "users",
-                        emailKey,
-                        userDataWithoutCart,
-                        function (err) {
+    tokensHandler.isTokenActive(token, function (isActive) {
+      if (isActive) {
+        _data.read("tokens", token, function (err, tokenData) {
+          if (!err) {
+            const email = tokenData.email;
+            const emailKey = helpers.getEmailKey(email);
+            _data.read("users", emailKey, function (err, userData) {
+              if (!err) {
+                let cartId = userData.cartId;
+                if (cartId) {
+                  if (deleteAll) {
+                    _data.delete("carts", cartId, function (err) {
+                      if (!err) {
+                        delete userData.cartId;
+                        _data.update("users", emailKey, userData, function (err) {
                           if (!err) {
-                            callback(200);
+                            callback(200, []);
                           } else {
-                            debug(
-                              `Error updating user with id ${cartData.email}`
-                            );
-                            callback(500, {
-                              Error: "Internal Server Error",
-                            });
+                            debug(`Error updating user with id ${userData.email}`);
+                            callback(500, { Error: "Internal server error" })
                           }
-                        }
-                      );
-                    } else {
-                      debug(`Error reading user with id ${cartData.email}`);
-                      callback(500, {
-                        Error: "Internal Server Error",
-                      });
-                    }
-                  });
+                        })
+                      } else {
+                        debug(`Error fetching cart with id ${cartId}`)
+                        callback(500, { Error: "Internal Server error" });
+                      }
+                    })
+                  } else {
+                    _data.read("carts", cartId, function (err, cartData) {
+                      if (!err) {
+                        const { cartItems } = cartData;
+                        const updatedCartItems = itemIds.reduce((cartItems, itemIdToDelete) => {
+                          delete cartItems[itemIdToDelete];
+                          return cartItems;
+                        }, cartItems);
+                        _carts.getItemsDetailForCartItems(updatedCartItems, (itemsDetail) => {
+                          callback(200, itemsDetail);
+                        });
+                      } else {
+                        debug(`Error reading from cart ${cartId}`);
+                        callback(500, { Error: "Internal Server error" });
+                      }
+                    })
+                  }
                 } else {
-                  debug(`Error deleting cart with id ${cartId}`);
-                  callback(500, { Error: "Internal Server Error" });
+                  callback(400, { Error: "No item in the cart to delete" });
                 }
-              });
-            } else {
-              callback(403, { Error: "Not Authorized" });
-            }
+              } else {
+                debug(`Error fetching user ${email}`);
+                callback(500, { Error: "Internal Server Error" });
+              }
+            });
+          } else {
+            debug(`Error fetching token ${token}`);
+            callback(500, { Error: "Internal Server Error" });
           }
-        );
+        });
       } else {
-        debug(`Error reading from cart ${cartId}`);
-        callback(500, { Error: "Cart doesn't exit with this id" });
+        callback(403, "Not Autorized");
       }
     });
   } else {
-    callback(400, { Error: "Invalid cart Id" });
+    callback(400, { Error: "Missing required inputs, or inputs are invalid" });
   }
-};
+}
 
 // Cart
 module.exports.default = function (requestData, callback) {

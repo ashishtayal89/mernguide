@@ -1,0 +1,25 @@
+.itemsContainer{
+    display: flex;
+    flex-direction: column;
+}
+
+.header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(247, 250, 252);
+}
+
+.carticon{
+    padding-right: 25px;
+}
+
+.carticon img{
+    height: 30px;
+    width: 30px;
+    border-radius: 6px;
+    box-shadow: 0px 0px 0px 0.5px rgb(50 50 93 / 10%),
+    0px 2px 5px 0px rgb(50 50 93 / 10%),
+    0px 1px 1.5px 0px rgb(0 0 0 / 7%);
+    cursor: pointer;
+}

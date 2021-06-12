@@ -13,39 +13,39 @@ _users.post = function (data, callback) {
   // Check that all required fields are filled out
   var firstName =
     typeof data.payload.firstName == "string" &&
-    data.payload.firstName.trim().length > 0
+      data.payload.firstName.trim().length > 0
       ? data.payload.firstName.trim()
       : false;
   var lastName =
     typeof data.payload.lastName == "string" &&
-    data.payload.lastName.trim().length > 0
+      data.payload.lastName.trim().length > 0
       ? data.payload.lastName.trim()
       : false;
   var email =
     typeof data.payload.email == "string" &&
-    helpers.isValidEmail(data.payload.email)
+      helpers.isValidEmail(data.payload.email)
       ? data.payload.email.trim()
       : false;
   var address =
     typeof data.payload.address == "string" &&
-    data.payload.address.trim().length > 0
+      data.payload.address.trim().length > 0
       ? data.payload.address.trim()
       : false;
   var password =
     typeof data.payload.password == "string" &&
-    data.payload.password.trim().length > 0
+      data.payload.password.trim().length > 0
       ? data.payload.password.trim()
       : false;
   var tosAgreement =
     typeof data.payload.tosAgreement == "boolean" &&
-    data.payload.tosAgreement == true
+      data.payload.tosAgreement == true
       ? true
       : false;
 
   if (firstName && lastName && email && address && password && tosAgreement) {
     var emailKey = helpers.getEmailKey(email);
     // Make sure the user doesnt already exist
-    _data.read("users", emailKey, function (err, _data) {
+    _data.read("users", emailKey, function (err, data) {
       if (err) {
         // Hash the password
         var hashedPassword = helpers.hash(password);
@@ -128,22 +128,22 @@ _users.put = function (data, callback) {
   // Check for optional fields
   var firstName =
     typeof data.payload.firstName == "string" &&
-    data.payload.firstName.trim().length > 0
+      data.payload.firstName.trim().length > 0
       ? data.payload.firstName.trim()
       : false;
   var lastName =
     typeof data.payload.lastName == "string" &&
-    data.payload.lastName.trim().length > 0
+      data.payload.lastName.trim().length > 0
       ? data.payload.lastName.trim()
       : false;
   var address =
     typeof data.payload.address == "string" &&
-    data.payload.address.trim().length > 0
+      data.payload.address.trim().length > 0
       ? data.payload.address.trim()
       : false;
   var password =
     typeof data.payload.password == "string" &&
-    data.payload.password.trim().length > 0
+      data.payload.password.trim().length > 0
       ? data.payload.password.trim()
       : false;
 
@@ -223,7 +223,7 @@ _users.delete = function (data, callback) {
                 // Delete each of the checks associated with the user
                 var userChecks =
                   typeof userData.checks == "object" &&
-                  userData.checks instanceof Array
+                    userData.checks instanceof Array
                     ? userData.checks
                     : [];
                 var checksToDelete = userChecks.length;

@@ -71,7 +71,6 @@ server.unifiedServer = function (req, res) {
       headers,
       payload: helpers.parseJsonToObject(buffer),
     };
-
     // Set Origin to enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     // Allow customheader
@@ -87,25 +86,36 @@ server.unifiedServer = function (req, res) {
     } else {
       // Choose the handler this request should go to.
       const chosenHandler =
-        typeof server.router[trimmedPath] != `undefined`
-          ? server.router[trimmedPath]
-          : handlers.notFound;
+        server.router[trimmedPath] || server.router['static'];
+
+
       // Route the request to data specified in the handler
-      chosenHandler(data, function (statusCode, payload) {
-        statusCode = typeof statusCode === "number" ? statusCode : 200;
-        payload = typeof payload === "object" ? payload : {};
+      chosenHandler(data, function (statusCode, payload, isStatic) {
+        if (isStatic) {
 
-        // Convert the payload to a string
-        var payloadString = JSON.stringify(payload);
+          // Set the status code
+          res.writeHeader(statusCode);
 
-        // Set the response as JSON
-        res.setHeader("Content-Type", "application/json");
+          // Send the static response back to client
+          res.end(payload);
+        } else {
+          statusCode = typeof statusCode === "number" ? statusCode : 200;
 
-        // Set the status code
-        res.writeHeader(statusCode);
+          payload = typeof payload === "object" ? payload : {};
 
-        // Send the response back to client
-        res.end(payloadString);
+          // Convert the payload to a string
+          var payloadString = JSON.stringify(payload);
+
+          // Set the response as JSON
+          res.setHeader("Content-Type", "application/json");
+
+          // Set the status code
+          res.writeHeader(statusCode);
+
+          // Send the response back to client
+          res.end(payloadString);
+        }
+
 
         // If the response is 200, print green, otherwise print red
         if (statusCode == 200) {
@@ -131,6 +141,8 @@ server.router = {
   tokens: handlers.tokens,
   carts: handlers.carts,
   items: handlers.items,
+  orders: handlers.orders,
+  static: handlers.static
 };
 
 server.init = function () {
