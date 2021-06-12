@@ -71,6 +71,7 @@ server.unifiedServer = function (req, res) {
       headers,
       payload: helpers.parseJsonToObject(buffer),
     };
+
     // Set Origin to enable CORS
     res.setHeader("Access-Control-Allow-Origin", "*");
     // Allow customheader
@@ -115,7 +116,6 @@ server.unifiedServer = function (req, res) {
           // Send the response back to client
           res.end(payloadString);
         }
-
 
         // If the response is 200, print green, otherwise print red
         if (statusCode == 200) {
