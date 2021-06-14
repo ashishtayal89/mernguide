@@ -22,3 +22,13 @@ document.getElementById("submit").onclick = function () {
         })
 }
 
+const token = localStorage.getItem("token");
+fetch(`tokens?id=${token}`, {
+    method: "GET",
+}).then(response => {
+    if (response.status === 200) {
+        location.replace("items.html");
+    }
+})
+
+

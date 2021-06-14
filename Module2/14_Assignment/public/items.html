@@ -2,26 +2,128 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Items</title>
+    <title>Pirple Node</title>
     <meta name="description" content="Login Page" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/items.css" />
-    <script src="/items.js" defer></script>
   </head>
 
   <body>
-    <div class="itemsContainer">
+    <div class="page">
       <div class="header">
-        <div></div>
-        <h1>Items</h1>
-        <div class="carticon"><img src="./css/carticon.jpeg" /></div>
+        <div class="left"></div>
+        <div class="center">
+          <h1>Pirple Node</h1>
+        </div>
+        <div class="right">
+          <div id="logout" class="logout">Sign Out</div>
+          <div id="carticon">
+            <img src="./css/carticon.jpeg" />
+            <div id="totalQuantity"></div>
+          </div>
+        </div>
       </div>
-      <div class="main"></div>
+      <div id="products" class="products">
+        <div class="product">
+          <div class="head">
+            <div class="title">Title</div>
+            <div class="rating">5</div>
+          </div>
+          <div class="desc">Description</div>
+          <div class="action">
+            <div class="price">Price</div>
+            <div class="add">
+              <button>Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="product">
+          <div class="head">
+            <div class="title">
+              Title Title Title Title Title Title Title Title Title Title Title
+              Title Title Title Title
+            </div>
+            <div class="rating">3.5</div>
+          </div>
+          <div class="desc">
+            Description Description Description Description Description
+            Description Description Description Description Description
+            Description Description
+          </div>
+          <div class="action">
+            <div class="price">USD 12.14</div>
+            <div class="add">
+              <button>Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="product">
+          <div class="head">
+            <div class="title">Title</div>
+            <div class="rating">5</div>
+          </div>
+          <div class="desc">Description</div>
+          <div class="action">
+            <div class="price">Price</div>
+            <div class="add">
+              <button>Add</button>
+            </div>
+          </div>
+        </div>
+        <div class="product">
+          <div class="head">
+            <div class="title">Title</div>
+            <div class="rating">5</div>
+          </div>
+          <div class="desc">Description</div>
+          <div class="action">
+            <div class="price">Price</div>
+            <div class="add">
+              <button>Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="cart">
-      <div class="items"></div>
-      <div class="total"></div>
-      <div class="checkout"></div>
+    <div id="cart" class="cart hide">
+      <div class="heading">Cart</div>
+      <div id="items" class="items">
+        <div class="item">
+          <div class="name">Name</div>
+          <div class="price">Price</div>
+          <div class="quantity">
+            <select>
+              <option key="1" selected>1</option>
+              <option key="2">2</option>
+            </select>
+          </div>
+          <div class="delete">Remove</div>
+        </div>
+        <div class="item">
+          <div class="name">Name</div>
+          <div class="price">Price</div>
+          <div class="quantity">
+            <select>
+              <option key="1" selected>1</option>
+              <option key="2">2</option>
+            </select>
+          </div>
+        </div>
+        <div class="item total">
+          <div class="name">Total</div>
+          <div class="price">Price</div>
+          <div class="quantity">Q</div>
+        </div>
+      </div>
+      <div id="checkout" class="checkout">CHECKOUT</div>
     </div>
+    <script src="/items.js" defer></script>
   </body>
 </html>
+
+<!-- "title": "Vegan",
+    "description": "Concept of healthy vegan eating",
+    "type": "vegan",
+    "price": 28.96,
+    "rating": 5 -->

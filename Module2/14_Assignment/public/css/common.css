@@ -1,0 +1,56 @@
+body{
+    margin:0 auto;
+}
+
+.page {
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    height: 10vh;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(247, 250, 252);
+}
+
+.header .right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-right: 3%;
+}
+
+.header .right > * {
+    padding-left: 15px;
+}
+ 
+.header .left{
+    padding-left: 30px;
+}
+
+.header .logout{
+    text-decoration: underline;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.header .logout:hover {
+    color: #4498cf;
+}
+
+.main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh;
+}
+
+.show{
+    visibility: initial;
+}
+
+.hide{
+    visibility: hidden;
+}

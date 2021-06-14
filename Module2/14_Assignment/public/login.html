@@ -5,24 +5,40 @@
     <title>Login</title>
     <meta name="description" content="Login Page" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/form.css" />
-    <link rel="stylesheet" href="css/index.css" />
-    <script src="/login.js" defer></script>
+    <link rel="stylesheet" href="css/login.css" />
   </head>
 
   <body>
-    <div class="login">
-      <div class="form">
-        <span id="error"></span>
-        <input placeholder="Email" id="email" type="email" class="input" />
-        <input
-          placeholder="Password"
-          id="password"
-          type="password"
-          class="input"
-        />
-        <button id="submit">Login</button>
+    <div class="page">
+      <div class="header">
+        <div class="left"></div>
+        <div class="center">
+          <h1>Pirple Node</h1>
+        </div>
+        <div class="right">
+          <a href="register.html">Sign Up</a>
+        </div>
+      </div>
+      <div class="main">
+        <div class="form">
+          <h2>Login</h2>
+          <span id="error"></span>
+          <input placeholder="Email" id="email" type="email" class="input" />
+          <input
+            placeholder="Password"
+            id="password"
+            type="password"
+            class="input"
+          />
+          <button id="submit">Login</button>
+        </div>
       </div>
     </div>
+    <div class="login">
+      <div class="form"></div>
+    </div>
+    <script src="/login.js" defer></script>
   </body>
 </html>

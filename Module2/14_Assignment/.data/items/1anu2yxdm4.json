@@ -1,1 +1,8 @@
-{"id":"1anu2yxdm4","title":"Vegan","description":"Concept of healthy vegan eating","type":"vegan","price":28.96,"rating":5}
+{
+    "id": "1anu2yxdm4",
+    "title": "Vegan",
+    "description": "Concept of healthy vegan eating",
+    "type": "vegan",
+    "price": 28.96,
+    "rating": 5
+}

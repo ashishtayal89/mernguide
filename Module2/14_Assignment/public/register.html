@@ -2,33 +2,51 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Register</title>
+    <title>Pirple Node</title>
     <meta name="description" content="Login Page" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/form.css" />
     <link rel="stylesheet" href="css/register.css" />
-    <script src="/register.js" defer></script>
   </head>
 
   <body>
-    <div class="login">
-      <div class="form">
-        <span id="error"></span>
-        <input placeholder="First Name" id="fName" type="text" class="input" />
-        <input placeholder="Last Name" id="lName" type="text" class="input" />
-        <input placeholder="Email" id="email" type="email" class="input" />
-        <input placeholder="Address" id="address" type="text" class="input" />
-        <input
-          placeholder="Password"
-          id="password"
-          type="password"
-          class="input"
-        />
-        <div>
-          <input id="tos" type="checkbox" class="input" /> Terms Of service
+    <div class="page">
+      <div class="header">
+        <div class="left"></div>
+        <div class="center">
+          <h1>Pirple Node</h1>
         </div>
-        <button id="submit">Login</button>
+        <div class="right">
+          <a href="login.html">Sign In</a>
+        </div>
+      </div>
+      <div class="main">
+        <div class="form">
+          <h2>Register</h2>
+          <span id="error"></span>
+          <input
+            placeholder="First Name"
+            id="fName"
+            type="text"
+            class="input"
+          />
+          <input placeholder="Last Name" id="lName" type="text" class="input" />
+          <input placeholder="Email" id="email" type="email" class="input" />
+          <input placeholder="Address" id="address" type="text" class="input" />
+          <input
+            placeholder="Password"
+            id="password"
+            type="password"
+            class="input"
+          />
+          <div>
+            <input id="tos" type="checkbox" class="input" /> Terms Of service
+          </div>
+          <button id="submit">Submit</button>
+        </div>
       </div>
     </div>
+    <script src="/register.js" defer></script>
   </body>
 </html>
