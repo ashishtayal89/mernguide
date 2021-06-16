@@ -14,6 +14,7 @@ const environments = {
       authToken: "9455e3eb3109edc12e3d8c92768f7a67",
       fromPhone: "+15005550006",
     },
+    stripeSecret: "sk_test_PGqotvlolbS4OvAhTsZWJAS300ee2jy9sU"
   },
   production: {
     httpPort: 5000,

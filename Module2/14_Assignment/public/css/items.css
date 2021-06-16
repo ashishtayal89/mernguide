@@ -31,7 +31,7 @@
     flex-direction: column;
     align-items: center;
     position: absolute;
-    min-height: 20vh;
+    min-height: 15vh;
     min-width: 450px;
     top: 8vh;
     right: 1%;
@@ -44,13 +44,27 @@
 
 .cart .heading{
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
-    font-weight: bold;
-    font-size: 1.5rem;
     height: 4vh;
     width: 100%;
+    padding: 10px;
+}
+
+.cart .heading .title{
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.cart .heading .close{
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.cart .heading .close:hover
+{
+    color:#4498cf;
 }
 
 .cart .items{
@@ -61,6 +75,7 @@
     align-items: center;
     min-height: 6vh;
     padding-bottom: 4vh;
+    background-color: #0072ff0d;
 }
 
 .cart .item{

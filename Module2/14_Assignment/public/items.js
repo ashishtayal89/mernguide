@@ -151,16 +151,18 @@ const itemsRenderer = {
         return products;
     },
     handleAddItem: async function (itemId, e) {
-        const cartItem = cart.data.find((cartItem) => cartItem.id === itemId);
-        const quantity = cartItem && cartItem.quantity || 0;
-        const response = await api.carts.createUpdate(itemId, quantity + 1);
-        cart.status = response.status;
-        if (response.status === 200) {
-            cart.data = response.data;
-        } else {
-            cart.error = response.data;
+        if (cart.data) {
+            const cartItem = cart.data.find((cartItem) => cartItem.id === itemId);
+            const quantity = cartItem && cartItem.quantity || 0;
+            const response = await api.carts.createUpdate(itemId, quantity + 1);
+            cart.status = response.status;
+            if (response.status === 200) {
+                cart.data = response.data;
+            } else {
+                cart.error = response.data;
+            }
+            cartRenderer.render(cart.data);
         }
-        cartRenderer.render(cart.data);
     }
 }
 
@@ -172,12 +174,12 @@ const cart = {
     init: async function () {
         const response = await api.carts.read();
         this.status = response.status;
-        if (response.status === 200) {
+        if (response.status === 200 && response.data) {
             this.data = response.data;
             cartRenderer.render(this.data);
         } else {
             this.error = response.data;
-            cartRenderer.renderError(this.data);
+            cartRenderer.renderError();
         }
     }
 }
@@ -195,10 +197,12 @@ const cartRenderer = {
         document.getElementById("totalQuantity").innerHTML = '';
         document.getElementById("totalQuantity").appendChild(document.createTextNode(totalQuantity));
     },
-    renderError: function (errorObj) {
+    renderError: function () {
         const cartItemsContainer = document.getElementById("items");
         if (cart.status === 401 || cart.status === 403) {
             cartItemsContainer.innerHTML = 'Please login to access the cart';
+        } else if (!cart.data) {
+            cartItemsContainer.innerHTML = 'No item in the cart';
         }
     },
     getCartItemsToRender: function (cartItems) {
@@ -313,8 +317,16 @@ const cartRenderer = {
 }
 
 
-function allowShowCart() {
+function allowOpenCloseCart() {
     document.getElementById("carticon").addEventListener("click", () => {
+        if (document.getElementById("cart").className.indexOf("hide") !== -1) {
+            document.getElementById("cart").className = "cart show";
+        } else {
+            document.getElementById("cart").className = "cart hide";
+        }
+    });
+
+    document.getElementById("close").addEventListener("click", () => {
         if (document.getElementById("cart").className.indexOf("hide") !== -1) {
             document.getElementById("cart").className = "cart show";
         } else {
@@ -336,26 +348,13 @@ function allowLogout() {
     });
 }
 
-function authenticate() {
-    const token = localStorage.getItem("token");
-    if (token) {
-        fetch(`tokens?id=${token}`, {
-            method: "GET",
-        }).then(response => {
-            if (response.status !== 200) {
-                location.replace("login.html");
-            }
-        })
-    } else {
-        location.replace("login.html");
+(async function () {
+    const isAutherized = await autherize();
+    if (isAutherized) {
+        items.init();
+        cart.init();
+        allowOpenCloseCart();
+        allowCheckout();
+        allowLogout();
     }
-}
-
-(function () {
-    authenticate();
-    items.init();
-    cart.init();
-    allowShowCart();
-    allowCheckout();
-    allowLogout();
 })()

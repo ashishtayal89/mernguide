@@ -13,7 +13,7 @@ _tokens.post = function (data, callback) {
   var emailKey = typeof email == "string" && helpers.getEmailKey(email);
   var password =
     typeof data.payload.password == "string" &&
-    data.payload.password.trim().length > 0
+      data.payload.password.trim().length > 0
       ? data.payload.password.trim()
       : false;
   if (emailKey && password) {
@@ -62,21 +62,28 @@ _tokens.get = function (data, callback) {
   // Check that id is valid
   var id =
     typeof data.queryStringObject.id == "string" &&
-    data.queryStringObject.id.trim().length == 20
+      data.queryStringObject.id.trim().length == 20
       ? data.queryStringObject.id.trim()
       : false;
-  if (id) {
-    // Lookup the token
-    _data.read("tokens", id, function (err, tokenData) {
-      if (!err && tokenData) {
-        callback(200, tokenData);
+  isTokenActive(id, function (isActive) {
+    if (isActive) {
+      if (id) {
+        // Lookup the token
+        _data.read("tokens", id, function (err, tokenData) {
+          if (!err && tokenData) {
+            callback(200, tokenData);
+          } else {
+            callback(404);
+          }
+        });
       } else {
-        callback(404);
+        callback(400, { Error: "Missing required field, or field invalid" });
       }
-    });
-  } else {
-    callback(400, { Error: "Missing required field, or field invalid" });
-  }
+    } else {
+      callback(403, { Error: "Not autherized" });
+    }
+  })
+
 };
 
 // Tokens - put
@@ -132,7 +139,7 @@ _tokens.delete = function (data, callback) {
   // Check that id is valid
   var id =
     typeof data.queryStringObject.id == "string" &&
-    data.queryStringObject.id.trim().length == 20
+      data.queryStringObject.id.trim().length == 20
       ? data.queryStringObject.id.trim()
       : false;
   if (id) {
@@ -167,7 +174,7 @@ module.exports.default = function (data, callback) {
 };
 
 // Verify if the token is still active
-module.exports.isTokenActive = function (id, callback) {
+function isTokenActive(id, callback) {
   _data.read("tokens", id, function (err, tokenData) {
     if (!err) {
       if (tokenData.expires > Date.now()) {
@@ -183,9 +190,10 @@ module.exports.isTokenActive = function (id, callback) {
     }
   });
 };
+module.exports.isTokenActive = isTokenActive;
 
 // Verify if a given token id is currently valid for a given user
-module.exports.isTokenAuthentic = function (id, email, callback) {
+function isTokenAuthentic(id, email, callback) {
   // Lookup the token
   _data.read("tokens", id, function (err, tokenData) {
     if (!err && tokenData) {
@@ -200,3 +208,4 @@ module.exports.isTokenAuthentic = function (id, email, callback) {
     }
   });
 };
+module.exports.isTokenAuthentic = isTokenAuthentic;

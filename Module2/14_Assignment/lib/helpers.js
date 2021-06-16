@@ -4,6 +4,7 @@
  */
 
 // Dependencies
+const queristring = require("querystring");
 var config = require("./config");
 var crypto = require("crypto");
 var https = require("https");
@@ -131,6 +132,103 @@ helpers.getEmailKey = (email) => {
   }
   return false;
 };
+
+helpers.flattenObject = (object) => {
+  let flattendObj = {};
+  const flatten = (obj, keyName) => {
+    Object.keys(obj).forEach(key => {
+      var newKey = keyName ? `${keyName}[${key}]` : key;
+      if (typeof obj[key] === "object") {
+        // calling the function again
+        flatten(obj[key], newKey);
+      } else {
+        flattendObj[newKey] = obj[key];
+      }
+    });
+    return flattendObj;
+  };
+  return flatten(object);
+}
+
+
+helpers.stripePayment = ({ amount, paymentMethodId }, callback) => {
+
+  // Create the payload string
+  const stringPayload = queristring.stringify(helpers.flattenObject({
+    amount,
+    currency: "USD",
+    description: "Software development services",
+    // This is a dummy shipping address
+    shipping: {
+      name: "Jenny Rosen",
+      address: {
+        line1: "510 Townsend St",
+        postal_code: "98140",
+        city: "San Francisco",
+        state: "CA",
+        country: "US",
+      },
+    },
+    payment_method: paymentMethodId,
+    confirmation_method: "manual",
+    confirm: true,
+  }));
+
+  // Configure the request details
+  var requestDetails = {
+    host: "api.stripe.com",
+    port: "443",
+    path: "/v1/payment_intents",
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${config.stripeSecret}`,
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Content-Length": Buffer.byteLength(stringPayload),
+    },
+  };
+
+
+  try {
+    // Create the Api request
+    const apiReq = https.request(requestDetails);
+
+    // Configure response handler
+    apiReq.on('response', (apiRes) => {
+      let response = '';
+
+      apiRes.setEncoding('utf8');
+      apiRes.on('data', (chunk) => {
+        response += chunk;
+      });
+
+      apiRes.on('end', () => {
+        const payload = JSON.parse(response);
+        const statusCode = apiRes.statusCode;
+        const clientSecret = payload.client_secret;
+        const requiresAction = payload.requiresAction;
+        const status = payload.status;
+        callback(false, { statusCode, status, clientSecret, requiresAction })
+      });
+    })
+
+    // Configure error handler
+    apiReq.on('error', (error) => {
+      callback(true, error)
+    });
+
+    // Send request payload
+    apiReq.write(stringPayload);
+
+    // End request
+    apiReq.end();
+
+  } catch (error) {
+    callback(true, error)
+  }
+
+
+}
 
 // Export the module
 module.exports = helpers;

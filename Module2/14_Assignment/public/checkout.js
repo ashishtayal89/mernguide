@@ -1,11 +1,6 @@
 // A reference to Stripe.js
 var stripe;
 
-var orderData = {
-    items: [{ id: "photo-subscription" }],
-    currency: "usd"
-};
-
 // Disable the button until we have Stripe set up on the page
 document.querySelector("button").disabled = true;
 
@@ -38,18 +33,42 @@ var setupElements = function () {
     };
 };
 
-function init() {
-    const { stripe, card } = setupElements();
-    document.querySelector("button").disabled = false;
-
-    var form = document.getElementById("payment-form");
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-        pay(stripe, card);
-    });
+async function getCartAmount() {
+    return fetch("/carts", {
+        method: "GET",
+        headers: { token: localStorage.getItem("token") },
+    })
+        .then(response => Promise.all([response.json(), response.status]))
+        .then((response) => {
+            const cartItems = response[0];
+            const status = response[1];
+            if (status === 200) {
+                let totalAmount = 0;
+                for (let cartItem of cartItems) {
+                    totalAmount += cartItem.price * cartItem.quantity;
+                }
+                return totalAmount;
+            }
+        });
 }
 
-
+async function init() {
+    const isAutherized = await autherize();
+    if (isAutherized) {
+        const { stripe, card } = setupElements();
+        document.querySelector("button").disabled = false;
+        var form = document.getElementById("payment-form");
+        const totalAmount = await getCartAmount();
+        if (totalAmount) {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                pay(stripe, card, totalAmount);
+            });
+        } else {
+            location.replace("items.html");
+        }
+    }
+}
 
 var handleAction = function (clientSecret) {
     stripe.handleCardAction(clientSecret).then(function (data) {
@@ -82,7 +101,7 @@ var handleAction = function (clientSecret) {
 /*
  * Collect card details and pay for the order
  */
-var pay = function (stripe, card) {
+var pay = function (stripe, card, totalAmount) {
     changeLoadingState(true);
 
     // Collects card details and creates a PaymentMethod
@@ -92,12 +111,12 @@ var pay = function (stripe, card) {
             if (result.error) {
                 showError(result.error.message);
             } else {
-                orderData.paymentMethodId = result.paymentMethod.id;
-
+                const orderData = { paymentMethodId: result.paymentMethod.id, amount: totalAmount };
                 return fetch("/orders", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        token: localStorage.getItem("token")
                     },
                     body: JSON.stringify(orderData)
                 });
@@ -124,10 +143,10 @@ var pay = function (stripe, card) {
 var orderComplete = function (clientSecret) {
     stripe.retrievePaymentIntent(clientSecret).then(function (result) {
         var paymentIntent = result.paymentIntent;
-        var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
+        // var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
 
         document.querySelector(".sr-payment-form").classList.add("hidden");
-        document.querySelector("pre").textContent = paymentIntentJson;
+        document.querySelector("pre").textContent = "Congratulation!! \n\n\n Order Placed";
 
         document.querySelector(".sr-result").classList.remove("hidden");
         setTimeout(function () {
