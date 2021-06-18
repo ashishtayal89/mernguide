@@ -13,23 +13,28 @@ _carts.getItemsDetailForCartItems = (cartItems, callback) => {
   let itemCount = 0;
   const itemsDetail = [];
   const itemIds = Object.keys(cartItems);
-  itemIds.map((itemId) => {
-    _data.read("items", itemId, function (err, itemData) {
-      itemCount++;
-      if (!err) {
-        let itemDetail = {
-          ...itemData,
-          quantity: cartItems[itemId]
-        };
-        itemsDetail.push(itemDetail);
-      } else {
-        console.log(`Error reading item with id : ${itemId}`);
-      }
-      if (itemCount === itemIds.length) {
-        callback(itemsDetail);
-      }
+  if (itemIds.length > 0) {
+    itemIds.map((itemId) => {
+      _data.read("items", itemId, function (err, itemData) {
+        itemCount++;
+        if (!err) {
+          let itemDetail = {
+            ...itemData,
+            quantity: cartItems[itemId]
+          };
+          itemsDetail.push(itemDetail);
+        } else {
+          console.log(`Error reading item with id : ${itemId}`);
+        }
+        if (itemCount === itemIds.length) {
+          callback(itemsDetail);
+        }
+      });
     });
-  });
+  } else {
+    callback([]);
+  }
+
 };
 
 // POST
@@ -45,7 +50,7 @@ _carts.post = function (requestData, callback) {
   const quantity =
     typeof requestData.payload.quantity === "number" &&
       requestData.payload.quantity > 0 &&
-      requestData.payload.quantity < 50 &&
+      requestData.payload.quantity <= 10 &&
       requestData.payload.quantity % 1 === 0 ?
       requestData.payload.quantity :
       false;

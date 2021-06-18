@@ -47,7 +47,7 @@ async function getCartAmount() {
                 for (let cartItem of cartItems) {
                     totalAmount += cartItem.price * cartItem.quantity;
                 }
-                return totalAmount;
+                return totalAmount.toFixed(2) * 1;
             }
         });
 }
@@ -60,6 +60,7 @@ async function init() {
         var form = document.getElementById("payment-form");
         const totalAmount = await getCartAmount();
         if (totalAmount) {
+            document.getElementById("price").innerText = `Total Amount $${totalAmount}`
             form.addEventListener("submit", function (event) {
                 event.preventDefault();
                 pay(stripe, card, totalAmount);
@@ -126,8 +127,8 @@ var pay = function (stripe, card, totalAmount) {
             return result.json();
         })
         .then(function (response) {
-            if (response.error) {
-                showError(response.error);
+            if (response.Error) {
+                showError(response.Error);
             } else if (response.requiresAction) {
                 // Request authentication
                 handleAction(response.clientSecret);
@@ -137,8 +138,6 @@ var pay = function (stripe, card, totalAmount) {
         });
 };
 
-/* ------- Post-payment helpers ------- */
-
 /* Shows a success / error message when the payment is complete */
 var orderComplete = function (clientSecret) {
     stripe.retrievePaymentIntent(clientSecret).then(function (result) {
@@ -146,7 +145,7 @@ var orderComplete = function (clientSecret) {
         // var paymentIntentJson = JSON.stringify(paymentIntent, null, 2);
 
         document.querySelector(".sr-payment-form").classList.add("hidden");
-        document.querySelector("pre").textContent = "Congratulation!! \n\n\n Order Placed";
+        document.querySelector("pre").textContent = "Congratulation!!";
 
         document.querySelector(".sr-result").classList.remove("hidden");
         setTimeout(function () {

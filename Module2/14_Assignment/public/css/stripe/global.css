@@ -20,18 +20,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+#price{
+  display: flex;
+  justify-content: center;
+}
+
 /* Layout */
 .sr-root {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   width: 100%;
-  max-width: 980px;
-  padding: 48px;
   align-content: center;
   justify-content: center;
   height: auto;
   min-height: 100vh;
-  margin: 0 auto;
 }
 .sr-main {
   display: flex;
@@ -96,7 +98,7 @@ input[type="text"]::placeholder {
   overflow: scroll;
 }
 .sr-result.expand {
-  height: 350px;
+  height: 100px;
 }
 
 .sr-combo-inputs-row {

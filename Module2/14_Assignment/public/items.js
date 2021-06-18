@@ -74,12 +74,12 @@ const items = {
     error: null,
     init: async function () {
         const response = await api.items.read();
-        this.status = response.status;
+        items.status = response.status;
         if (response.status === 200) {
-            this.data = response.data;
-            itemsRenderer.render(this.data);
+            items.data = response.data;
+            itemsRenderer.renderData(items.data);
         } else {
-            this.error = response.data;
+            items.error = response.data;
             itemsRenderer.renderError();
         }
 
@@ -87,10 +87,10 @@ const items = {
 }
 
 const itemsRenderer = {
-    render: function (items) {
+    renderData: function (items) {
         const productsContainer = document.getElementById("products");
         productsContainer.innerHTML = '';
-        const products = this.getItemsToRender(items);
+        const products = itemsRenderer.getItemsToRender(items);
         for (let product of products) {
             productsContainer.appendChild(product);
         }
@@ -132,7 +132,7 @@ const itemsRenderer = {
             price.appendChild(document.createTextNode(`USD ${item.price}`));
             price.className = "price";
             addButton.appendChild(document.createTextNode("Add"));
-            addButton.addEventListener("click", this.handleAddItem.bind(this, item.id));
+            addButton.addEventListener("click", itemsRenderer.handleAddItem.bind(this, item.id));
             add.appendChild(addButton);
             add.className = 'add';
             action.appendChild(price);
@@ -161,7 +161,7 @@ const itemsRenderer = {
             } else {
                 cart.error = response.data;
             }
-            cartRenderer.render(cart.data);
+            cartRenderer.renderData(cart.data);
         }
     }
 }
@@ -173,21 +173,28 @@ const cart = {
     error: null,
     init: async function () {
         const response = await api.carts.read();
-        this.status = response.status;
-        if (response.status === 200 && response.data) {
-            this.data = response.data;
-            cartRenderer.render(this.data);
-        } else {
-            this.error = response.data;
-            cartRenderer.renderError();
-        }
+        cartRenderer.render(response);
     }
 }
 
 const cartRenderer = {
-    render: function (cartItems) {
+    render: function (response) {
+        cart.status = response.status;
+        if (response.status === 200 && response.data) {
+            cart.data = response.data;
+            if (response.data.length) {
+                cartRenderer.renderData(cart.data);
+            } else {
+                cartRenderer.renderError();
+            }
+        } else {
+            cart.error = response.data;
+            cartRenderer.renderError();
+        }
+    },
+    renderData: function (cartItems) {
         const cartItemsContainer = document.getElementById("items");
-        const cartItemsToRender = this.getCartItemsToRender(cartItems);
+        const cartItemsToRender = cartRenderer.getCartItemsToRender(cartItems);
         cartItemsContainer.innerHTML = '';
         for (let cartItemToRender of cartItemsToRender) {
             cartItemsContainer.appendChild(cartItemToRender);
@@ -201,7 +208,7 @@ const cartRenderer = {
         const cartItemsContainer = document.getElementById("items");
         if (cart.status === 401 || cart.status === 403) {
             cartItemsContainer.innerHTML = 'Please login to access the cart';
-        } else if (!cart.data) {
+        } else if (!cart.data || !cart.data.length) {
             cartItemsContainer.innerHTML = 'No item in the cart';
         }
     },
@@ -236,14 +243,14 @@ const cartRenderer = {
                 quantityOption.appendChild(document.createTextNode(i));
                 quantitySelect.appendChild(quantityOption);
             }
-            quantitySelect.addEventListener("change", this.handleCartUpdate.bind(this, cartItem.id));
+            quantitySelect.addEventListener("change", cartRenderer.handleCartUpdate.bind(this, cartItem.id));
             quantity.className = "quantity";
             quantity.appendChild(quantitySelect);
 
             // Compose remove
             remove.className = "delete";
             remove.appendChild(document.createTextNode("Remove"));
-            remove.addEventListener("click", this.handleRemoveItem.bind(this, cartItem.id));
+            remove.addEventListener("click", cartRenderer.handleRemoveItem.bind(this, cartItem.id));
 
             // Compose item
             item.className = "item";
@@ -293,26 +300,11 @@ const cartRenderer = {
     handleCartUpdate: async function (itemId, e) {
         const quantity = e.target.value * 1;
         const response = await api.carts.createUpdate(itemId, quantity);
-        cart.status = response.status;
-        if (response.status === 200) {
-            cart.data = response.data;
-            this.render(cart.data);
-        } else {
-            cart.error = response.data;
-            this.renderError(cart.error);
-        }
-
+        cartRenderer.render(response);
     },
     handleRemoveItem: async function (itemId) {
         const response = await api.carts.remove(itemId);
-        cart.status = response.status;
-        if (response.status === 200) {
-            cart.data = response.data;
-            this.render(cart.data);
-        } else {
-            cart.error = response.data;
-            this.renderError(cart.error);
-        }
+        cartRenderer.render(response);
     }
 }
 
