@@ -79,11 +79,23 @@ _orders.post = function (data, callback) {
                                                                                         debug(`Cart could not be deleted for order ${orderId} and cart ${cartId}`);
                                                                                     } else {
                                                                                         delete userData["cartId"];
+                                                                                        let { orders } = userData;
+                                                                                        if (orders) {
+                                                                                            orders.push(orderId);
+                                                                                        } else {
+                                                                                            orders = [orderId]
+                                                                                        }
+                                                                                        userData = { ...userData, orders };
                                                                                         _data.update("users", emailKey, userData, function (err) {
                                                                                             debug(`Cart could not be unliked from user ${emailKey} for order ${orderId}`);
                                                                                         })
                                                                                     }
                                                                                 });
+                                                                                helpers.sendMailgunEmail(email, orderData, function (err) {
+                                                                                    if (err) {
+                                                                                        debug(`Mail could not be send for order ${orderId}`)
+                                                                                    }
+                                                                                })
                                                                             } else {
                                                                                 debug(`Order could not be placed for order ${orderId}`);
                                                                                 callback(500, { Error: "Order could not be placed, the debited amount will be credited back in 24 hours" });
@@ -103,7 +115,6 @@ _orders.post = function (data, callback) {
                                                         }
                                                     }
                                                 });
-
                                             }
                                         } else {
                                             debug(`Error reading from cart ${cartId} `);

@@ -4,11 +4,10 @@
  */
 
 // Dependencies
-const queristring = require("querystring");
+const querystring = require("querystring");
 var config = require("./config");
 var crypto = require("crypto");
 var https = require("https");
-var querystring = require("querystring");
 var { EMAIL_VALIDATION, EMAIL_KEYS } = require("../constants");
 
 // Container for all the helpers
@@ -154,7 +153,7 @@ helpers.flattenObject = (object) => {
 helpers.stripePayment = ({ amount, paymentMethodId }, callback) => {
 
   // Create the payload string
-  const stringPayload = queristring.stringify(helpers.flattenObject({
+  const stringPayload = querystring.stringify(helpers.flattenObject({
     amount,
     currency: "USD",
     description: "Software development services",
@@ -187,7 +186,6 @@ helpers.stripePayment = ({ amount, paymentMethodId }, callback) => {
       "Content-Length": Buffer.byteLength(stringPayload),
     },
   };
-
 
   try {
     // Create the Api request
@@ -226,8 +224,63 @@ helpers.stripePayment = ({ amount, paymentMethodId }, callback) => {
   } catch (error) {
     callback(true, error)
   }
+}
 
 
+helpers.generateEmailHtml = function (orderData) {
+
+  const orderId = `<div><b>Order Id : </b>${orderData.id}</div>`;
+  const amount = `<div><b>Amount : </b>$${orderData.totalAmount}</div>`;
+  return `<div style="display:flex;flex-direction: column;border:1px solid black;
+          padding:20px;justify-content:center;align-items:center;width: 300px;margin:0 auto;
+          font-size:20px;background: #e0eff3;">${orderId} ${amount}</div>`;
+}
+
+
+helpers.sendMailgunEmail = function (email, orderData, callback) {
+
+  const { apiKey, domain } = config.mailgun;
+
+  const payload = {
+    from: "Mailgun Sandbox <postmaster@sandboxcb1449cc151142dfaae096e20ca77fa8.mailgun.org>",
+    to: email,
+    subject: "Order Placed!!",
+    html: helpers.generateEmailHtml(orderData)
+  };
+
+  const stringPayload = querystring.stringify(payload);
+
+  const requestDetails = {
+    hostname: 'api.mailgun.net',
+    port: 443,
+    protocol: 'https:',
+    path: `/v3/${domain}/messages`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': Buffer.byteLength(stringPayload)
+    },
+    auth: `api:${apiKey}`,
+    agent: false,
+    timeout: undefined
+  };
+
+  var req = https.request(requestDetails, function (res) {
+    var status = res.statusCode;
+    if (status == 200 || status == 201) {
+      callback(false);
+    } else {
+      callback("Status code returned was " + status);
+    }
+  });
+
+  req.on("error", function (e) {
+    callback(e);
+  });
+
+  req.write(stringPayload);
+
+  req.end();
 }
 
 // Export the module

@@ -14,7 +14,11 @@ const environments = {
       authToken: "9455e3eb3109edc12e3d8c92768f7a67",
       fromPhone: "+15005550006",
     },
-    stripeSecret: "sk_test_PGqotvlolbS4OvAhTsZWJAS300ee2jy9sU"
+    stripeSecret: "sk_test_PGqotvlolbS4OvAhTsZWJAS300ee2jy9sU",
+    mailgun: {
+      apiKey: "f3b785d5d577dafd9b22a66574b46f55-1f1bd6a9-4b245962",
+      domain: "sandboxcb1449cc151142dfaae096e20ca77fa8.mailgun.org"
+    }
   },
   production: {
     httpPort: 5000,
