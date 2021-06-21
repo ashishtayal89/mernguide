@@ -14,8 +14,18 @@
 
 6. When an order is placed, you should email the user a receipt. You should integrate with the sandbox of Mailgun.com for this. Note: Every Mailgun account comes with a sandbox email account domain (whatever@sandbox123.mailgun.org) that you can send from by default. So, there's no need to setup any DNS for your domain for this task https://documentation.mailgun.com/en/latest/faqs.html#how-do-i-pick-a-domain-name-for-my-mailgun-account
 
-### Cart
+### Start
 
-1. Every user will have a unique cart id.
-2.
-3.
+1. Start the application using `node index.js`. This will start an application `localhost:3000`.
+2. Browse this to go to the login page. Before login you need to signup yourself which you can do by going to the signup screen.
+3. After signup you can login to the application which has a listing of products.
+4. You can add different products into your cart and then checkout.
+5. After checkout you be asked to enter the card details. You can use the below dummy card details.
+
+```javascript
+// 4242 4242 4242 4242
+// Any future date
+// Any CVV and PIN
+```
+
+6. Upon successfull payment you will be shown a success message on the screen and a order reciept will be sent to you email.
