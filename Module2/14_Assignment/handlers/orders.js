@@ -21,6 +21,7 @@ const _orders = {};
 // Required data : none
 // Optional data : none
 _orders.get = function (data, callback) {
+    // Implementation for this is pending
 };
 
 // Orders - Post
