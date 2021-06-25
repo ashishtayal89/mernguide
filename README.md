@@ -1,86 +1,105 @@
-# Isomorphic React
+# pluralsight-course-server-side-rendered-react-nextjs
+The master branch here is the latest updates to the Pluralsight course published by Peter Kellner in December of 2018 in the master branch.
 
-## A Starter Isomorphic React Application with All Best Practices and No Frills
+Course on Pluralsight:
+https://app.pluralsight.com/library/courses/building-server-side-rendered-react-apps-beginners
 
-![image](https://user-images.githubusercontent.com/4268152/31387801-c091f5c8-ad99-11e7-9cb6-42fcde98fc88.png)
+# Course Code for [Building Server-side Rendered React Apps for Beginners](https://app.pluralsight.com/profile/author/peter-kellner) on Pluralsight
 
-### About The Application
+This GitHub repo includes source for all modules of the course that involve code.
 
-This application is a basic API client which gathers data from an outside API (in this case, Stackoverflow) and generates an isomorphic, single-page application (SPA).
+Before you start, you should install node on either your Windows or Mac computer (those are the two environments that are tested). Below, in
+"Getting Started" are the basics to get module 6 up and running as fast as possible.
 
-### Why Isomorphic React?
+## Getting Started
+1. **Install [Node 10.1.0 with NPM 5.6](https://nodejs.org)**. 
+2. **Clone this repository.** - `git clone https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs` or [download the zip](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/archive/master.zip)
+3. **Set the default directory to which module you want (example: cd m3-Building-Data-Driven-SSR-App/I-NextJS-GetInitialProps - `cd m3-Building-Data-Driven-SSR-App/I-NextJS-GetInitialProps`
+4. **Install Node Packages with Dependencies.** - `npm install`
+5. **Install [this chrome extension](https://chrome.google.com/webstore/detail/nextjs-utilities-extensio/ffcogmoganomoabikgmcmckdgojnpldo) for viewing performance data (optional).**
+6. **Run the web app - `npm run dev` 
 
-Great question!
+## How to Use This Repo While Watching the Course
 
-- Uses React / Redux as main application engine
-- Supports hot reloading and server rendering!
-- Uses React Router (in a combination with server rendering that is truly amazing)
-- No fluff, just the good stuff
+### Special Note: Many examples require your local json server be running. If you get an error including "map" it means the data array trying to be mapped over does not exist.  Remember you need to start the json-server by typing `npm run json-server`
 
-### Getting Started
+It is suggested that you clone or download this repository to your
+local computer while you are watching the course. If you are planning on 
+watching the course without coding along, this will give you 
+a nice view into the source files for every clip and what the 
+completed files look like at the end of that module.
 
-1. Clone the repository
-2. install dependencies
-   `npm install && npm run postinstall`
-3. Run the dev server
-   `npm run start-dev`
-4. Navigate to the application's url
-   `http://localhost:3000/`
+If, you plan on coding along, there are parts in the course
+where it will be helpful to be able to cut and paste
+code from the completed modules to continue. For things like
+css and other assets, you will need to copy those into
+your working project to continue. Having the source downloaded and along
+side your project will be very helpful.
 
-### Usage
+## Table of Contents
 
-#### Enabling / Disabling Server Rendering
+### Learning the Fundamentals (Module 3)
 
-Server rendering is great, but sometimes we want to disable it when there's an error in our render and we'd rather troubleshoot it in the client.
-This setting is passed in as a CLI argument via the `--useServerRender=true` argument.
-You can modify this in `package.json` to `--useServerRender=false` which will disable any server-side rendering functionality.
+#### [2 Using DOM Methods to Write to a Browser](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/02-Using-Dom-Methods-to-Write-To-Browser)
+#### [3 Replacing DOM Methods with React](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/03-Replacing-DOM-Methods-With-React)
+#### [4 Creating a React Functional Component](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/04-Creating-a-React-Functional-Component)
+#### [5 Passing Props to a Functional Component](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/05-Passing-Props-to-a-Component)
+#### [6 Converting a Functional Component to a Class Component](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/06-Converting-a-Functional-Component-to-Class-Component)
+#### [8 Building an app with Next.js and JSX](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/08-Building-an-App-with-Nextjs-and-JSX)
+#### [9 Adding a CSS File to Next.js](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m3-Learning-the-Fundamentals/09-Integrating-a-CSS-File-into-the-Nextjs-Project)
 
-#### Enabling / Disabling Live Data
+### Using REST Data in Server-side React Apps (Module 4)
 
-This application is designed to grab the latest data from `Stackoverflow.com`. However, their API has a strict request limit which means that no questions will be returned after X requests (usually 300).
-Therefore, the application comes loaded with mock-questions in the data directory.
-To ease the learning process by eliminating potential sources of error, live data is disabled by default.
-However, you are strongly encouraged to use live data once you understand the associated pitfalls.
+#### [3 Coding a Server-side and Client-side Rendering React App](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m4-Using-REST-Data-in-Server-side/03-Coding-a-Server-and-Client-side-Rendering-Solution)
+#### [4 Adding Async to getInitialProps](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m4-Using-REST-Data-in-Server-side/04-Taking-Nextjs-GetInitialProps-to-Async-by-promise)
+#### [5 Rendering Async REST Data Client and Server](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m4-Using-REST-Data-in-Server-side/05-Rendering-Async-REST-Data-Server-and-Client-side)
+#### [6 Learning Client-side Routing with Next.js and the Link Element](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m4-Using-REST-Data-in-Server-side/06-Learn-Client-side-Page-Routing-with-NextJS-Link-Element)
 
-- Note: You can increase your allotted requests to a much larger number by registering an application here,
-  `https://stackapps.com/apps/oauth/register` and then appending the key to the URLs in `data/api-real-url.js`
+### Extending Server-side Rendered React App to the Real World (Module 5)
 
-### Production Build
+#### [2 Integrate Bootstrap 4](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m5-Extending-Your-Server-side-Rendered-App-to-Real-World/02-Integrate-Bootstrap-4)
+#### [3 Refactor Bootstrap to React Components](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m5-Extending-Your-Server-side-Rendered-App-to-Real-World/03-Refactoring-Static-Bootstrap-to-React-Components)
+#### [4 Add a NextJS Layout Page](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m5-Extending-Your-Server-side-Rendered-App-to-Real-World/04-Add-a-Layout-Page-with-the-Nextjs-app-file)
+#### [5 Refactor to Bootstrap Cards](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m5-Extending-Your-Server-side-Rendered-App-to-Real-World/05-More-Detailed-Refactoring-Bootstrap-Cards)
+#### [6 Adding a Speaker Detail Page](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m5-Extending-Your-Server-side-Rendered-App-to-Real-World/06-Adding-a-Speaker-Detail-Page-That-Works-Client-side-Only)
+#### [7 Adding Server-side Rendered Pages That Include Query Strings](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m5-Extending-Your-Server-side-Rendered-App-to-Real-World/07-Server-side-Rendering-Landing-Page-with-Query-Params)
 
-This application fully supports a production build setting, which disables live reloading in favor of precompiled and uglified JS, which boosts performance.
-To run production, run the command `npm run start-prod`, which automatically triggers the `build` script.
-This mode is recommended for production. However, this boilerplate has never been used in actual production so utilize caution if deploying as a real application.
+### Deploy Server-side Rendered React App to Node.js (Module 6)
 
-### Troubleshooting
+#### [2 Setting Up and Using Environmental Variables](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m6-Deploying-to-Node-Server/02-Setting-up-and-Using-Environmental-Variables)
+#### [3 Configuring Default Environmental Variables](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m6-Deploying-to-Node-Server/03-Configuring-Default-Environmental-Variables)
+#### [5 Create a Docker Image For The Production React App](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m6-Deploying-to-Node-Server/05-Create-a-Docker-Image-and-Container)
 
-#### `unexpected token import`
+### Ensuring the React App Performs (Module 7)
 
-This error appears when babel is not configured correctly. This can actually be caused by outdated global dependencies, and is hard to fix. For best results, try the following -
+#### [2 Better Image Handling with next-images](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m7-Ensuring-Your-App-Performs/02-Better-Image-Handling-with-next-images)
+#### [3 Adding Page Caching to the Node Express Server](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m7-Ensuring-Your-App-Performs/03-Adding-Page-Caching-to-the-Node-Express-Server)
+#### [4 Using a CDN to Improve Page Performance](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m7-Ensuring-Your-App-Performs/04-Using-a-CDN-for-JavaScript-CSS-Images)
+#### [5 Using Placeholder Animated Images While Users Wait for Data to Download](https://github.com/pkellner/pluralsight-course-server-side-rendered-react-nextjs/tree/master/m7-Ensuring-Your-App-Performs/05-Using-Placeholder-images-While-Waiting-for-Data)
 
-- Install `babel-register` as a local saved dependency
-- Update global versions of `babel`, `webpack` and all dependencies to latest / course versions
 
-#### Any Error That is Taking a Long Time to Troubleshoot
 
-Things can always go wrong in the world of programming. If this happens, clone the master branch of this repo to a new directory and run the installation instructions. If desired, you can work backwards, pruning extra files until you get the application in the state you want.
 
-#### Problems with the Repo
 
-I want this repo to work perfectly for as many users as possible. Got a problem? <a href=https://github.com/danielstern/isomorphic-react/issues/new>Open an issue!</a> Let's figure out a solution together.
+## Module Details
 
-### Basic Concepts
+To run each of these scripts, cd into the appropriate direct ( example: `m3-Building-Data-Driven-SSR-App/I-NextJS-GetInitialProps` ) 
 
-1. **Flow** :
-   <img width="1057" alt="Screenshot 2020-04-14 at 5 05 28 PM" src="https://user-images.githubusercontent.com/46783722/79221098-d6014380-7e72-11ea-961d-0d79157e6820.png">
+then run the script name as follows:
 
-2. **Advantages** :
-   - Functional : Better perfromance, better SEO since the search engine indexing imporves with improved html response. Support for legacy browsers.
-   - Technical : Same code for FE and BE so easy maintenance.
-3. **Challenges** :
-   - Complex architecture.
-   - Challenging troubleshoot.
-   - Sensative data prone to exposure.
-     <img width="1296" alt="Screenshot 2020-04-14 at 5 25 22 PM" src="https://user-images.githubusercontent.com/46783722/79222330-f3cfa800-7e74-11ea-86c3-dcbbbeaa74dc.png">
-   - More points of failure.
-4. **Priority** :
-   <img width="1341" alt="Screenshot 2020-04-14 at 5 39 37 PM" src="https://user-images.githubusercontent.com/46783722/79223427-f16e4d80-7e76-11ea-9809-546671481a72.png">
+`npm run dev`
+
+
+[![Course Preview](https://img.youtube.com/vi/rJSXRGegxFw/0.jpg)](https://www.youtube.com/watch?v=rJSXRGegxFw)
+
+## Experimental Directories
+
+In several modules, you may see a directory named `_experimental`.  The project in this directory may or may not be working. It may contain 
+test files or work in progress files for other students. You can ignore that directory whenever you see it.
+
+
+
+
+
+
+
