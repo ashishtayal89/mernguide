@@ -7,7 +7,7 @@ const webpack = require('webpack');
  * See Development webpack config for detailed comments
  */
 
-module.exports = {
+module.exports.default = {
     mode: 'development',
     entry: [
         'babel-regenerator-runtime',

@@ -13,7 +13,7 @@ import { get } from 'request-promise';
 import { ConnectedRouter } from 'react-router-redux';
 import getStore from '../src/getStore'
 import { Provider } from 'react-redux';
-import createHistory from 'history/createMemoryHistory';
+import {createMemoryHistory as createHistory} from 'history';
 
 /**
  * Try and find a specific port as provided by an external cloud host, or go with a default value

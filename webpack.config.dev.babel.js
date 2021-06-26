@@ -6,7 +6,7 @@ import path from 'path';
  * Development webpack config designed to be loaded by express development server
  */
 
-module.exports = {
+module.exports.default = {
     /**
      * The scripts in entry are combined in order to create our bundle
      */
