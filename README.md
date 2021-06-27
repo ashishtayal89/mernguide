@@ -158,3 +158,21 @@ Eg : Build a trading web app, web app that users can use to generate invoices, d
 | Live Reload                                                                                                                                                              | HRM                                                                                                                                                                      |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | <img width="1018" alt="Screenshot 2021-06-26 at 9 26 21 PM" src="https://user-images.githubusercontent.com/46783722/123518793-33269500-d6c5-11eb-8924-6cfb5bc1d52a.png"> | <img width="1025" alt="Screenshot 2021-06-26 at 9 26 33 PM" src="https://user-images.githubusercontent.com/46783722/123518797-39b50c80-d6c5-11eb-9367-2e6936ad235d.png"> |
+
+## Application Setup
+
+### Configure Babel
+
+1. We use babel-node instead of node so that it can first tranpile the node js files based on .babelrc and then execute it use node. babel-node is available to use by installing the `babel-cli@7.0.0-beta.3` package globally.
+
+#### Core Dependencies
+
+- `babel-core@6.26.0` is responsible to run all other babel based plugins.
+- `babel-loader@7.1.2` is what allows babel to load js,jsx and json files and learn to handle them.
+
+#### Plugins
+
+- `"@babel/plugin-proposal-object-rest-spread": "^7.0.0"`: Allows babel to transpile object spread syntax.
+- `"@babel/preset-env": "^7.0.0"`: Supports all the ES6 features.
+- `"@babel/preset-react": "^7.0.0",` : Supports jsx features.
+- `"babel-regenerator-runtime": "^6.5.0",` : Supports regenerator runtime.
